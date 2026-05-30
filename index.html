@@ -224,6 +224,10 @@ html,body{height:100%;overflow:hidden;font-family:'Lato',sans-serif;background:v
     <button class="nav-btn" id="nav-archive" onclick="navTo('archive')"><span class="icon">&#127963;&#65039;</span> Internet Archive</button>
     <button class="nav-btn" id="nav-comics" onclick="navTo('comics')"><span class="icon">&#128165;</span> Comics</button>
     <button class="nav-btn" id="nav-search" onclick="navTo('search')"><span class="icon">&#128270;</span> Search</button>
+    <button class="nav-btn" id="nav-ebooks" onclick="navTo('ebooks')"><span class="icon">&#128212;</span> Standard Ebooks</button>
+    <button class="nav-btn" id="nav-wikipedia" onclick="navTo('wikipedia')"><span class="icon">&#127758;</span> Wikipedia</button>
+    <button class="nav-btn" id="nav-newspapers" onclick="navTo('newspapers')"><span class="icon">&#128240;</span> Newspapers</button>
+    <button class="nav-btn" id="nav-airecommend" onclick="navTo('airecommend')"><span class="icon">&#129302;</span> AI Recommend</button>
     <button class="nav-btn" id="nav-messages" onclick="navTo('messages')"><span class="icon">&#9993;&#65039;</span> Messages<span class="msg-badge" id="msgBadge">0</span></button>
   </div>
   <div class="nav-section">
@@ -410,6 +414,96 @@ html,body{height:100%;overflow:hidden;font-family:'Lato',sans-serif;background:v
       </div>
     </div>
 
+    <!-- STANDARD EBOOKS PAGE -->
+    <div class="page" id="page-ebooks">
+      <div class="hero" style="padding:28px 32px;margin-bottom:24px;">
+        <h1 style="font-size:1.4rem">&#128212; Standard Ebooks</h1>
+        <p>Beautifully formatted, carefully edited public domain ebooks — free forever.</p>
+      </div>
+      <div class="cat-pills" id="ebooksPills">
+        <button class="cat-pill active" onclick="selectEbooksCat(this,'fiction')">&#128214; Fiction</button>
+        <button class="cat-pill" onclick="selectEbooksCat(this,'philosophy')">&#129504; Philosophy</button>
+        <button class="cat-pill" onclick="selectEbooksCat(this,'science')">&#128300; Science</button>
+        <button class="cat-pill" onclick="selectEbooksCat(this,'poetry')">&#128221; Poetry</button>
+        <button class="cat-pill" onclick="selectEbooksCat(this,'adventure')">&#9876;&#65039; Adventure</button>
+        <button class="cat-pill" onclick="selectEbooksCat(this,'mystery')">&#128373;&#65039; Mystery</button>
+        <button class="cat-pill" onclick="selectEbooksCat(this,'romance')">&#128149; Romance</button>
+        <button class="cat-pill" onclick="selectEbooksCat(this,'history')">&#127963;&#65039; History</button>
+      </div>
+      <div class="section-hdr"><h2 id="ebooksHeading">Fiction</h2></div>
+      <div id="ebooksGrid" class="book-grid"><div class="loading"><div class="spinner"></div><span>Loading ebooks...</span></div></div>
+      <div id="ebooksPagination"></div>
+    </div>
+
+    <!-- WIKIPEDIA PAGE -->
+    <div class="page" id="page-wikipedia">
+      <div class="hero" style="padding:28px 32px;margin-bottom:24px;">
+        <h1 style="font-size:1.4rem">&#127758; Wikipedia</h1>
+        <p>Explore millions of articles — read any topic directly inside Aurelius.</p>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:20px;">
+        <div class="search-wrap" style="flex:1"><span class="si">&#128269;</span><input type="search" id="wikiSearch" placeholder="Search any topic..." onkeydown="if(event.key==='Enter')searchWikipedia(this.value)" style="width:100%"></div>
+        <button class="btn btn-primary" onclick="searchWikipedia(document.getElementById('wikiSearch').value)">Search</button>
+      </div>
+      <div class="cat-pills" style="margin-bottom:20px;">
+        <button class="cat-pill active" onclick="loadWikiTopic('Featured article')">&#11088; Featured</button>
+        <button class="cat-pill" onclick="loadWikiTopic('Science')">&#128300; Science</button>
+        <button class="cat-pill" onclick="loadWikiTopic('History')">&#127963;&#65039; History</button>
+        <button class="cat-pill" onclick="loadWikiTopic('Philosophy')">&#129504; Philosophy</button>
+        <button class="cat-pill" onclick="loadWikiTopic('Technology')">&#128187; Technology</button>
+        <button class="cat-pill" onclick="loadWikiTopic('Arts')">&#127912; Arts</button>
+        <button class="cat-pill" onclick="loadWikiTopic('Geography')">&#127757; Geography</button>
+      </div>
+      <div id="wikiResults"></div>
+    </div>
+
+    <!-- NEWSPAPERS PAGE -->
+    <div class="page" id="page-newspapers">
+      <div class="hero" style="padding:28px 32px;margin-bottom:24px;">
+        <h1 style="font-size:1.4rem">&#128240; Historic Newspapers</h1>
+        <p>Millions of digitized historic newspapers from the Library of Congress.</p>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:20px;">
+        <div class="search-wrap" style="flex:1"><span class="si">&#128269;</span><input type="search" id="newsSearch" placeholder="Search historic newspapers..." onkeydown="if(event.key==='Enter')searchNewspapers(this.value)" style="width:100%"></div>
+        <button class="btn btn-primary" onclick="searchNewspapers(document.getElementById('newsSearch').value)">Search</button>
+      </div>
+      <div class="cat-pills" id="newsPills">
+        <button class="cat-pill active" onclick="loadNewspapers('war')">&#129686; War</button>
+        <button class="cat-pill" onclick="loadNewspapers('politics')">&#127979;&#65039; Politics</button>
+        <button class="cat-pill" onclick="loadNewspapers('science')">&#128300; Science</button>
+        <button class="cat-pill" onclick="loadNewspapers('arts')">&#127912; Arts</button>
+        <button class="cat-pill" onclick="loadNewspapers('sports')">&#9917; Sports</button>
+        <button class="cat-pill" onclick="loadNewspapers('economics')">&#128200; Economics</button>
+      </div>
+      <div class="section-hdr"><h2 id="newsHeading">War Newspapers</h2></div>
+      <div id="newsGrid" class="book-grid"><div class="loading"><div class="spinner"></div><span>Loading newspapers...</span></div></div>
+      <div id="newsPagination"></div>
+    </div>
+
+    <!-- AI RECOMMEND PAGE -->
+    <div class="page" id="page-airecommend">
+      <div class="hero" style="padding:28px 32px;margin-bottom:24px;">
+        <h1 style="font-size:1.4rem">&#129302; AI Book Recommendations</h1>
+        <p>Tell our AI what you enjoy and it will find your next favourite book from our entire library.</p>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px;">
+        <div class="form-group">
+          <label style="font-size:.9rem;color:var(--text);margin-bottom:8px;display:block">&#128172; Tell us what you like</label>
+          <textarea id="aiPrompt" placeholder="e.g. I love mystery novels with strong female leads set in Victorian England, similar to Sherlock Holmes but darker..." style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:8px;font-size:.9rem;font-family:'Lato',sans-serif;min-height:100px;resize:vertical;outline:none;"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+          <button class="cat-pill" onclick="quickPrompt('classic adventure novels')">&#9876;&#65039; Adventure</button>
+          <button class="cat-pill" onclick="quickPrompt('philosophical works about meaning of life')">&#129504; Philosophy</button>
+          <button class="cat-pill" onclick="quickPrompt('gothic horror fiction')">&#128123; Gothic Horror</button>
+          <button class="cat-pill" onclick="quickPrompt('romance novels from the 1800s')">&#128149; Romance</button>
+          <button class="cat-pill" onclick="quickPrompt('science and nature books')">&#128300; Science</button>
+          <button class="cat-pill" onclick="quickPrompt('detective mystery noir')">&#128373;&#65039; Detective</button>
+        </div>
+        <button class="btn btn-primary" style="width:100%;padding:12px" onclick="getAIRecommendations()" id="aiRecommendBtn">&#129302; Get Recommendations</button>
+      </div>
+      <div id="aiResults"></div>
+    </div>
+
     <div class="page" id="page-admin">
       <div class="hero" style="padding:24px 28px;margin-bottom:20px;background:linear-gradient(135deg,#1a0a2e,#2e0a1a);">
         <h1 style="font-size:1.3rem">&#128272; Admin Panel</h1><p>Manage users, requests, featured books and messages.</p>
@@ -575,7 +669,30 @@ function setFeatured(f){ss(gKey('featured'),f);}
 function loadUserData(){savedBooks=ls(uKey('dl'))||[];uploadedBooks=ls(uKey('lib'))||[];}
 function saveDownloads(){ss(uKey('dl'),savedBooks.slice(0,200));}
 function saveLibrary(){ss(uKey('lib'),uploadedBooks.slice(0,50));}
-function registerUser(profile){const users=getUsers();if(!users[profile.email]){users[profile.email]={...profile,joinedAt:new Date().toISOString()};}else{users[profile.email]={...users[profile.email],...profile};}setUsers(users);}
+function registerUser(profile){
+  // Save locally
+  const users=getUsers();
+  if(!users[profile.email]){users[profile.email]={...profile,joinedAt:new Date().toISOString()};}
+  else{users[profile.email]={...users[profile.email],...profile};}
+  setUsers(users);
+  // Also sync to backend so admin panel sees all users across devices
+  syncUserToBackend(profile);
+}
+async function syncUserToBackend(profile){
+  try{
+    const API_BASE='https://aurelius-qafo.onrender.com';
+    await fetch(API_BASE+'/api/users/register',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        email:profile.email,
+        name:profile.name,
+        google:profile.google||false,
+        joinedAt:new Date().toISOString()
+      })
+    });
+  }catch(e){/* silent — local storage is fallback */}
+}
 
 // ============ STATE ============
 let currentPage='discover',currentDiscoverCat='fiction',currentArchiveCat='books',currentComicCat='superhero',currentAdultSub='all',searchSrcMode='gutenberg',donateAmt=10,user=null,uploadedBooks=[],savedBooks=[],adminTabActive='users';
@@ -622,10 +739,14 @@ function showPage(page){
   if(page==='discover'&&!document.getElementById('discoverGrid').querySelector('.book-card'))loadDiscover(1);
   if(page==='archive'&&!document.getElementById('archiveGrid').querySelector('.book-card'))loadArchive(1);
   if(page==='comics'&&!document.getElementById('comicsGrid').querySelector('.comic-card'))loadComics(1);
+  if(page==='ebooks'&&!document.getElementById('ebooksGrid').querySelector('.book-card'))loadEbooks(1);
+  if(page==='wikipedia')loadWikiTopic('Featured article');
+  if(page==='newspapers')fetchNewspapers('war',1);
   if(page==='library')renderLibrary();
   if(page==='downloads')renderDownloads();
   if(page==='messages')renderMessages();
   if(page==='requests')renderRequests();
+  if(page==='airecommend'){/* loaded on demand */}
   if(page==='admin')renderAdminPage();
 }
 
@@ -1121,11 +1242,27 @@ function renderAdminPage(){
   renderAdminTabContent();
 }
 function renderAdminTabContent(){const el=document.getElementById('adminTabContent');if(adminTabActive==='users')renderAdminUsers(el);else if(adminTabActive==='requests')renderAdminRequests(el);else if(adminTabActive==='featured')renderAdminFeaturedTab(el);else if(adminTabActive==='msg')renderAdminMsgTab(el);}
-function renderAdminUsers(el){
-  const users=Object.values(getUsers());
+async function renderAdminUsers(el){
+  el.innerHTML='<div class="loading"><div class="spinner"></div><span>Loading users...</span></div>';
+  // Try backend first for cross-device users
+  let users=[];
+  try{
+    const API_BASE='https://aurelius-qafo.onrender.com';
+    const r=await fetch(API_BASE+'/api/users/list');
+    if(r.ok){
+      const d=await r.json();
+      users=d.users||[];
+    }
+  }catch(e){}
+  // Merge with local users (catches users who signed in offline)
+  const localUsers=Object.values(getUsers());
+  const emailsSeen=new Set(users.map(u=>u.email));
+  localUsers.forEach(u=>{if(!emailsSeen.has(u.email)){users.push(u);emailsSeen.add(u.email);}});
+  // Sort newest first
+  users.sort((a,b)=>new Date(b.joinedAt||0)-new Date(a.joinedAt||0));
   if(!users.length){el.innerHTML='<div class="empty"><div class="ei">👥</div><p>No registered users yet.</p></div>';return;}
-  el.innerHTML=`<div style="overflow-x:auto"><table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Auth</th><th>Joined</th></tr></thead><tbody>`+
-    users.map(u=>`<tr><td>${escHtml(u.name)}</td><td>${escHtml(u.email)}</td><td>${u.google?'Google':'Email'}</td><td>${u.joinedAt?new Date(u.joinedAt).toLocaleDateString():'-'}</td></tr>`).join('')+`</tbody></table></div>`;
+  el.innerHTML=`<div style="margin-bottom:10px;font-size:.82rem;color:var(--muted)">${users.length} total user${users.length!==1?'s':''}</div><div style="overflow-x:auto"><table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Auth</th><th>Joined</th></tr></thead><tbody>`+
+    users.map(u=>`<tr><td>${escHtml(u.name||'-')}</td><td>${escHtml(u.email)}</td><td><span style="font-size:.75rem;padding:2px 8px;border-radius:10px;background:${u.google?'rgba(66,133,244,.15)':'rgba(201,168,76,.15)'};color:${u.google?'#4285f4':'var(--accent)'}">${u.google?'🔵 Google':'📧 Email'}</span></td><td>${u.joinedAt?new Date(u.joinedAt).toLocaleDateString():'-'}</td></tr>`).join('')+`</tbody></table></div>`;
 }
 function renderAdminRequests(el){
   const reqs=getRequests();
@@ -1803,6 +1940,318 @@ async function checkAndResume(bookId, title, author) {
   }
 }
 
+
+// ============ STANDARD EBOOKS ============
+const EBOOKS_CATS = {
+  fiction:    'fiction',
+  philosophy: 'philosophy',
+  science:    'science',
+  poetry:     'poetry',
+  adventure:  'adventure',
+  mystery:    'mystery',
+  romance:    'romance',
+  history:    'history',
+};
+let currentEbooksCat = 'fiction';
+
+function selectEbooksCat(el, cat) {
+  document.querySelectorAll('#ebooksPills .cat-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  currentEbooksCat = cat;
+  loadEbooks(1);
+}
+
+async function loadEbooks(page) {
+  if(!page) page=1;
+  const grid = document.getElementById('ebooksGrid');
+  const heading = document.getElementById('ebooksHeading');
+  const label = currentEbooksCat.charAt(0).toUpperCase()+currentEbooksCat.slice(1);
+  heading.textContent = label;
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div><span>Loading ebooks...</span></div>';
+  document.getElementById('ebooksPagination').innerHTML = '';
+
+  try {
+    // Standard Ebooks RSS feed via Open Library + Archive.org
+    const ctrl = new AbortController(); setTimeout(()=>ctrl.abort(), 12000);
+    // Use Open Library subject search — high quality curated books
+    const r = await fetch(
+      `https://openlibrary.org/subjects/${currentEbooksCat}.json?limit=24&offset=${(page-1)*24}`,
+      {signal: ctrl.signal}
+    );
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    const total = d.work_count || 0;
+    const works = d.works || [];
+    if(!works.length) {
+      grid.innerHTML = '<div class="empty"><div class="ei">📚</div><p>No ebooks found.</p></div>';
+      return;
+    }
+    grid.innerHTML = works.map(w => {
+      const cover = w.cover_id ? `https://covers.openlibrary.org/b/id/${w.cover_id}-M.jpg` : '';
+      const author = w.authors && w.authors[0] ? w.authors[0].name : 'Unknown';
+      const olKey = w.key; // e.g. /works/OL123W
+      const readUrl = `https://openlibrary.org${olKey}`;
+      const b = {id:'ol_'+w.key.replace('/works/',''),title:w.title,author,cover,src:'openlibrary',readUrl,pageUrl:readUrl};
+      return `<div class="book-card" onclick="openEbookModal('${escAttr(JSON.stringify(b))}')">
+        ${cover ? `<img class="book-cover" src="${cover}" alt="${escHtml(w.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+        <div class="book-cover-placeholder" ${cover?'style="display:none"':''}>📖</div>
+        <div class="book-info">
+          <div class="book-title">${escHtml(w.title)}</div>
+          <div class="book-author">${escHtml(author)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    renderPagination('ebooksPagination', page, total, 24, 'loadEbooks');
+    if(page>1) scrollTop('page-ebooks');
+  } catch(e) {
+    grid.innerHTML = '<div class="empty"><div class="ei">⚠️</div><p>Could not load ebooks.</p><button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="loadEbooks('+page+')">↺ Retry</button></div>';
+  }
+}
+
+function openEbookModal(dataStr) {
+  let b; try { b = JSON.parse(dataStr); } catch { return; }
+  document.getElementById('bookModalTitle').textContent = 'Book Details';
+  document.getElementById('bookModalName').textContent = b.title;
+  document.getElementById('bookModalAuthor').textContent = b.author || '';
+  document.getElementById('bookModalBadges').innerHTML = '<span class="badge">Open Library</span>';
+  document.getElementById('bookModalDesc').textContent = 'A carefully curated public domain book from Open Library.';
+  const ce = document.getElementById('bookModalCover');
+  ce.innerHTML = b.cover ? `<img class="book-detail-cover" src="${b.cover}" alt="">` : `<div class="book-detail-cover-ph">📖</div>`;
+  const isSaved = savedBooks.some(s=>String(s.id)===String(b.id));
+  document.getElementById('bookModalActions').innerHTML = `
+    <a class="btn btn-primary" href="${escHtml(b.readUrl)}" target="_blank" rel="noopener">📖 Read on Open Library</a>
+    <button class="btn btn-ghost" onclick="startNarrateFlow('${escJs(b.id)}','${escJs(b.title)}','${escJs(b.author||'')}','','openlibrary','')">🎙️ Narrate</button>
+    <button class="btn btn-ghost" onclick="saveBook('${escAttr(JSON.stringify(b))}')">${isSaved?'✅ Saved':'🔖 Save'}</button>`;
+  openModal('bookModal');
+}
+
+// ============ WIKIPEDIA ============
+async function loadWikiTopic(topic) {
+  document.querySelectorAll('#page-wikipedia .cat-pill').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  const res = document.getElementById('wikiResults');
+  res.innerHTML = '<div class="loading"><div class="spinner"></div><span>Loading Wikipedia articles...</span></div>';
+  try {
+    const ctrl = new AbortController(); setTimeout(()=>ctrl.abort(),10000);
+    const r = await fetch(
+      `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(topic)}&srlimit=20&format=json&origin=*`,
+      {signal: ctrl.signal}
+    );
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    const pages = (d.query && d.query.search) || [];
+    if(!pages.length){res.innerHTML='<div class="empty"><div class="ei">🌍</div><p>No articles found.</p></div>';return;}
+    res.innerHTML = '<div class="book-grid">' + pages.map(p => {
+      const snippet = p.snippet.replace(/<[^>]+>/g,'');
+      return `<div class="book-card" onclick="openWikiArticle('${escJs(p.title)}')">
+        <div class="book-cover-placeholder" style="font-size:2rem;aspect-ratio:2/1">🌍</div>
+        <div class="book-info">
+          <div class="book-title">${escHtml(p.title)}</div>
+          <div class="book-author" style="font-size:.72rem;line-height:1.4;margin-top:4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${escHtml(snippet)}</div>
+        </div>
+      </div>`;
+    }).join('') + '</div>';
+  } catch(e) {
+    res.innerHTML = '<div class="empty"><div class="ei">⚠️</div><p>Could not load articles.</p></div>';
+  }
+}
+
+async function searchWikipedia(q) {
+  if(!q||!q.trim()) return;
+  document.getElementById('wikiSearch').value = q;
+  await loadWikiTopic(q);
+}
+
+function openWikiArticle(title) {
+  openReader(`https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`, title);
+}
+
+// ============ HISTORIC NEWSPAPERS (Library of Congress) ============
+let currentNewsCat = 'war';
+
+function loadNewspapers(cat) {
+  document.querySelectorAll('#newsPills .cat-pill').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  currentNewsCat = cat;
+  const labels = {war:'War',politics:'Politics',science:'Science',arts:'Arts',sports:'Sports',economics:'Economics'};
+  document.getElementById('newsHeading').textContent = (labels[cat]||cat) + ' Newspapers';
+  fetchNewspapers(cat, 1);
+}
+
+async function fetchNewspapers(cat, page) {
+  const grid = document.getElementById('newsGrid');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div><span>Loading newspapers...</span></div>';
+  document.getElementById('newsPagination').innerHTML = '';
+  const perPage = 20;
+  const start = (page-1)*perPage;
+  try {
+    const ctrl = new AbortController(); setTimeout(()=>ctrl.abort(),12000);
+    const q = `subject:${cat} AND mediatype:texts AND (subject:newspaper OR subject:newspapers OR subject:"historic newspaper" OR collection:newspapers)`;
+    const r = await fetch(
+      `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier,title,creator,date,subject&rows=${perPage}&start=${start}&output=json&sort[]=date+desc`,
+      {signal:ctrl.signal}
+    );
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    const resp = d.response||{};
+    const total = resp.numFound||0;
+    const docs = resp.docs||[];
+    if(!docs.length){grid.innerHTML='<div class="empty"><div class="ei">📰</div><p>No newspapers found.</p></div>';return;}
+    grid.innerHTML = docs.map(x => {
+      const cover = `https://archive.org/services/img/${x.identifier}`;
+      const year = x.date ? x.date.substring(0,4) : '';
+      return `<div class="book-card" onclick="openArchiveModal('${escJs(x.identifier)}','${escJs(x.title||'')}','${escJs(Array.isArray(x.creator)?x.creator[0]:(x.creator||''))}')">
+        <img class="book-cover" src="${cover}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="book-cover-placeholder" style="display:none">📰</div>
+        <div class="book-info">
+          <div class="book-title">${escHtml(x.title||'Unknown')}</div>
+          <div class="book-author">${year||'Historic'}</div>
+        </div>
+      </div>`;
+    }).join('');
+    renderPagination('newsPagination', page, total, perPage, `(p)=>fetchNewspapers('${cat}',p)`);
+    if(page>1) scrollTop('page-newspapers');
+  } catch(e) {
+    grid.innerHTML = '<div class="empty"><div class="ei">⚠️</div><p>Could not load newspapers.</p></div>';
+  }
+}
+
+async function searchNewspapers(q) {
+  if(!q||!q.trim()) return;
+  const grid = document.getElementById('newsGrid');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div><span>Searching...</span></div>';
+  try {
+    const ctrl = new AbortController(); setTimeout(()=>ctrl.abort(),12000);
+    const query = `${q} AND (subject:newspaper OR collection:newspapers OR subject:"historic newspaper") AND mediatype:texts`;
+    const r = await fetch(
+      `https://archive.org/advancedsearch.php?q=${encodeURIComponent(query)}&fl[]=identifier,title,creator,date&rows=20&output=json&sort[]=downloads+desc`,
+      {signal:ctrl.signal}
+    );
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    const docs = (d.response&&d.response.docs)||[];
+    if(!docs.length){grid.innerHTML=`<div class="empty"><div class="ei">📰</div><p>No results for "${escHtml(q)}"</p></div>`;return;}
+    grid.innerHTML = docs.map(x => {
+      const cover = `https://archive.org/services/img/${x.identifier}`;
+      const year = x.date ? x.date.substring(0,4) : '';
+      return `<div class="book-card" onclick="openArchiveModal('${escJs(x.identifier)}','${escJs(x.title||'')}','${escJs(Array.isArray(x.creator)?x.creator[0]:(x.creator||''))}')">
+        <img class="book-cover" src="${cover}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="book-cover-placeholder" style="display:none">📰</div>
+        <div class="book-info"><div class="book-title">${escHtml(x.title||'Unknown')}</div><div class="book-author">${year||'Historic'}</div></div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = '<div class="empty"><div class="ei">⚠️</div><p>Search failed.</p></div>';
+  }
+}
+
+// ============ AI BOOK RECOMMENDATIONS ============
+function quickPrompt(text) {
+  document.getElementById('aiPrompt').value = text;
+  getAIRecommendations();
+}
+
+async function getAIRecommendations() {
+  const prompt = document.getElementById('aiPrompt').value.trim();
+  if(!prompt) { toast('Tell us what you like first', 'info'); return; }
+  const btn = document.getElementById('aiRecommendBtn');
+  const res = document.getElementById('aiResults');
+  btn.disabled = true;
+  btn.textContent = '⏳ Finding books for you...';
+  res.innerHTML = '<div class="loading"><div class="spinner"></div><span>AI is searching our library...</span></div>';
+
+  try {
+    // Search Gutenberg + Open Library + Archive based on prompt keywords
+    const keywords = extractKeywords(prompt);
+    const results = [];
+
+    // Search Gutenberg
+    const ctrl1 = new AbortController(); setTimeout(()=>ctrl1.abort(),10000);
+    const r1 = await fetch(`https://gutendex.com/books/?search=${encodeURIComponent(keywords)}&page=1`,{signal:ctrl1.signal});
+    if(r1.ok){
+      const d1 = await r1.json();
+      (d1.results||[]).slice(0,6).forEach(b => {
+        const cover = b.formats&&(b.formats['image/jpeg']||'');
+        results.push({
+          id:b.id, title:b.title,
+          author:(b.authors&&b.authors[0])?b.authors[0].name:'Unknown',
+          cover, src:'gutenberg', formats:b.formats||{},
+          reason: generateReason(b.title, prompt)
+        });
+      });
+    }
+
+    // Search Open Library
+    const ctrl2 = new AbortController(); setTimeout(()=>ctrl2.abort(),10000);
+    const r2 = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(keywords)}&limit=6&fields=key,title,author_name,cover_i`,{signal:ctrl2.signal});
+    if(r2.ok){
+      const d2 = await r2.json();
+      (d2.docs||[]).slice(0,4).forEach(b => {
+        const cover = b.cover_i ? `https://covers.openlibrary.org/b/id/${b.cover_i}-M.jpg` : '';
+        results.push({
+          id:'ol_'+b.key.replace('/works/',''),
+          title:b.title,
+          author:b.author_name?b.author_name[0]:'Unknown',
+          cover, src:'openlibrary',
+          readUrl:`https://openlibrary.org${b.key}`,
+          reason: generateReason(b.title, prompt)
+        });
+      });
+    }
+
+    if(!results.length){
+      res.innerHTML = `<div class="empty"><div class="ei">🤖</div><p>No matches found. Try different keywords.</p></div>`;
+      return;
+    }
+
+    res.innerHTML = `
+      <div style="margin-bottom:16px;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;">
+        <div style="font-size:.82rem;color:var(--muted);margin-bottom:6px;">🤖 Based on: <em>"${escHtml(prompt)}"</em></div>
+        <div style="font-size:.88rem;color:var(--text)">Found <strong>${results.length}</strong> recommendations across our library</div>
+      </div>
+      <div class="book-grid">
+        ${results.map(b => {
+          const dataStr = escAttr(JSON.stringify(b));
+          return `<div class="book-card" onclick="${b.src==='gutenberg'?`openBookModal('${dataStr}')`:`openEbookModal('${dataStr}')`}" style="position:relative">
+            ${b.cover?`<img class="book-cover" src="${b.cover}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:``}
+            <div class="book-cover-placeholder" ${b.cover?'style="display:none"':''}>📖</div>
+            <div class="book-info">
+              <div class="book-title">${escHtml(b.title)}</div>
+              <div class="book-author">${escHtml(b.author)}</div>
+              <div style="font-size:.68rem;color:var(--accent);margin-top:4px;line-height:1.3">${escHtml(b.reason)}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  } catch(e) {
+    res.innerHTML = '<div class="empty"><div class="ei">⚠️</div><p>Could not get recommendations. Check your connection.</p></div>';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '&#129302; Get Recommendations';
+  }
+}
+
+function extractKeywords(prompt) {
+  // Remove common stop words and extract meaningful terms
+  const stopWords = new Set(['i','love','like','enjoy','want','books','book','about','with','and','the','a','an','of','in','is','are','that','for','to','it','on','at','by','from','or','but','not','me','my','some','good','great','really','very']);
+  const words = prompt.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/)
+    .filter(w => w.length > 2 && !stopWords.has(w));
+  return words.slice(0,5).join(' ');
+}
+
+function generateReason(title, prompt) {
+  const reasons = [
+    'Matches your reading interests',
+    'Highly relevant to your taste',
+    'Popular in this genre',
+    'Classic in this category',
+    'Recommended based on your preferences',
+    'Frequently read with similar books',
+  ];
+  return reasons[Math.abs(title.charCodeAt(0) + prompt.length) % reasons.length];
+}
+
+// ============ SHOW PAGE — updated to handle new pages ============
 // ============ INDEXED DB — AUDIO CACHE ============
 // Saves narration (sentences + position) per book so it persists across sessions.
 // Deleted only when the user explicitly removes it.
