@@ -730,35 +730,141 @@ function buildArchiveCard(d){
 }
 
 // ============ COMICS ============
-const CQ={superhero:'collection:(ComicBookPlus OR dccomics OR marvel_comics) AND mediatype:texts AND subject:(superhero OR batman OR superman OR avengers OR xmen)',manga:'mediatype:texts AND (subject:manga OR collection:manga)',horror:'mediatype:texts AND subject:(comics OR "comic book") AND subject:(horror OR terror OR vampire OR zombie)','sci-fi':'mediatype:texts AND subject:(comics OR "comic book") AND subject:("science fiction" OR "sci-fi" OR space OR robot)',fantasy:'mediatype:texts AND subject:(comics OR "comic book") AND subject:(fantasy OR dragon OR magic OR sword)',romance:'mediatype:texts AND subject:(comics OR "comic book") AND subject:(romance OR love)',war:'mediatype:texts AND subject:(comics OR "comic book") AND subject:(war OR military OR soldier OR combat)',western:'mediatype:texts AND subject:(comics OR "comic book") AND subject:(western OR cowboy OR outlaw)',crime:'mediatype:texts AND subject:(comics OR "comic book") AND subject:(crime OR detective OR noir OR gangster)'};
-const ADQ={all:'mediatype:texts AND (collection:adult_comics OR subject:"underground comix" OR subject:"adult comics" OR subject:"erotic comics")',straight:'mediatype:texts AND (subject:"underground comix" OR subject:"adult comics") AND (subject:heterosexual OR subject:straight)',gay:'mediatype:texts AND (subject:"underground comix" OR subject:"adult comics" OR subject:"gay comics") AND subject:gay',lesbian:'mediatype:texts AND (subject:"underground comix" OR subject:"adult comics" OR subject:"lesbian comics") AND subject:lesbian',trans:'mediatype:texts AND (subject:"adult comics" OR subject:"underground comix") AND (subject:transgender OR subject:trans)',bisexual:'mediatype:texts AND (subject:"adult comics" OR subject:"underground comix") AND subject:bisexual',interracial:'mediatype:texts AND (subject:"adult comics" OR subject:"underground comix") AND subject:interracial',milf:'mediatype:texts AND (subject:"adult comics" OR subject:"underground comix") AND (subject:mature OR subject:milf)',bbw:'mediatype:texts AND (subject:"adult comics" OR subject:"underground comix") AND (subject:bbw OR subject:"plus size")',bdsm:'mediatype:texts AND (subject:"adult comics" OR subject:"underground comix") AND (subject:bdsm OR subject:bondage OR subject:fetish)',hentai:'mediatype:texts AND (subject:hentai OR subject:"adult manga" OR collection:hentai)',underground:'mediatype:texts AND (subject:"underground comix" OR collection:underground_comix OR subject:comix)'};
-function selectComicCat(el,cat){document.querySelectorAll('#comicPills .cat-pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');currentComicCat=cat;currentAdultSub='all';const sr=document.getElementById('adultSubRow');if(cat==='adult'){sr.classList.add('show');document.querySelectorAll('.sub-pill').forEach(p=>p.classList.remove('active'));document.querySelector('.sub-pill').classList.add('active');}else sr.classList.remove('show');loadComics(1);}
-function selectAdultSub(el,sub){document.querySelectorAll('.sub-pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');currentAdultSub=sub;loadComics(1);}
+// Tight, exclusive queries — each category has strict subject filters
+// that prevent cross-contamination between genres.
+// Adult queries are completely isolated from non-adult using NOT clauses.
+const CQ = {
+  // Superhero: only DC/Marvel/superhero collections, explicitly exclude adult
+  superhero: 'mediatype:texts AND (collection:dccomics OR collection:marvel_comics OR collection:ComicBookPlus) AND (subject:superhero OR subject:batman OR subject:superman OR subject:spider-man OR subject:avengers OR subject:"x-men" OR subject:wonder-woman OR subject:flash OR subject:iron-man OR subject:captain-america) AND NOT subject:"adult comics" AND NOT subject:"underground comix" AND NOT subject:erotic AND NOT subject:hentai AND NOT subject:pornography',
+
+  // Manga: Japanese manga only, no adult
+  manga: 'mediatype:texts AND (collection:manga OR subject:manga OR subject:"graphic novel") AND (subject:manga OR subject:anime OR subject:shonen OR subject:shojo OR subject:seinen) AND NOT subject:"adult comics" AND NOT subject:hentai AND NOT subject:erotic AND NOT subject:pornography',
+
+  // Horror: horror comics strictly, no superhero crossover
+  horror: 'mediatype:texts AND (subject:"horror comics" OR subject:"horror comic" OR subject:"EC Comics" OR subject:"Tales from the Crypt" OR subject:vampire OR subject:zombie OR subject:werewolf OR subject:ghost) AND (subject:comics OR subject:"comic book" OR mediatype:texts) AND NOT subject:superhero AND NOT subject:"adult comics" AND NOT subject:erotic',
+
+  // Sci-Fi: science fiction comics, no superhero
+  'sci-fi': 'mediatype:texts AND (subject:"science fiction comics" OR subject:"sci-fi comics" OR subject:"space comics") AND (subject:"science fiction" OR subject:"sci-fi" OR subject:space OR subject:robot OR subject:alien OR subject:futuristic) AND NOT subject:superhero AND NOT subject:"adult comics" AND NOT subject:erotic',
+
+  // Fantasy: fantasy comics, swords and sorcery
+  fantasy: 'mediatype:texts AND (subject:"fantasy comics" OR subject:"sword and sorcery" OR subject:conan OR subject:"Conan the Barbarian" OR subject:barbarian OR subject:wizards OR subject:dragons) AND NOT subject:superhero AND NOT subject:"adult comics" AND NOT subject:erotic',
+
+  // Romance: romance comics from golden/silver age
+  romance: 'mediatype:texts AND (subject:"romance comics" OR subject:"love comics" OR subject:"young romance" OR subject:"teen romance" OR subject:"romance comic") AND NOT subject:"adult comics" AND NOT subject:erotic AND NOT subject:pornography',
+
+  // War: war comics
+  war: 'mediatype:texts AND (subject:"war comics" OR subject:"war comic" OR subject:"combat comics" OR subject:"military comics" OR subject:"G.I. Joe" OR subject:"Sgt. Fury" OR subject:"Our Army at War") AND NOT subject:"adult comics" AND NOT subject:erotic',
+
+  // Western: cowboy and western comics
+  western: 'mediatype:texts AND (subject:"western comics" OR subject:"cowboy comics" OR subject:cowboy OR subject:outlaw OR subject:"Lone Ranger" OR subject:"western comic") AND NOT subject:"adult comics" AND NOT subject:erotic',
+
+  // Crime: crime noir detective comics
+  crime: 'mediatype:texts AND (subject:"crime comics" OR subject:"detective comics" OR subject:noir OR subject:"gangster comics" OR subject:"crime comic" OR subject:"true crime") AND NOT subject:"adult comics" AND NOT subject:erotic AND NOT subject:superhero',
+};
+
+// Adult queries — all require explicit adult subject tags
+// and use OR across multiple related tags for maximum coverage per page
+const ADQ = {
+  all:        'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:"underground comix" OR subject:erotica OR subject:"erotic comic") AND NOT subject:superhero',
+  straight:   'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:heterosexual OR subject:straight OR subject:"male-female" OR subject:pinup OR subject:"pin-up")',
+  gay:        'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica OR subject:"gay comics" OR subject:"gay erotica") AND (subject:gay OR subject:"gay male" OR subject:"men loving men")',
+  lesbian:    'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica OR subject:"lesbian comics") AND (subject:lesbian OR subject:"women loving women" OR subject:"sapphic")',
+  trans:      'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:transgender OR subject:trans OR subject:"gender bending" OR subject:crossdressing)',
+  bisexual:   'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:bisexual OR subject:"bi comics" OR subject:"group sex")',
+  interracial:'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:interracial OR subject:"interracial sex" OR subject:"mixed couples")',
+  milf:       'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:milf OR subject:mature OR subject:"older women" OR subject:"cougar")',
+  bbw:        'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:bbw OR subject:"plus size" OR subject:"curvy" OR subject:"full figured")',
+  bdsm:       'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:bdsm OR subject:bondage OR subject:fetish OR subject:dominatrix OR subject:submission)',
+  hentai:     'mediatype:texts AND (subject:hentai OR subject:"adult manga" OR subject:"erotic manga" OR collection:hentai OR subject:"ecchi")',
+  underground:'mediatype:texts AND (subject:"underground comix" OR collection:underground_comix OR subject:comix OR subject:"Zap Comix" OR subject:"underground comics")',
+};
+
+function selectComicCat(el,cat){
+  document.querySelectorAll('#comicPills .cat-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  currentComicCat=cat;
+  currentAdultSub='all';
+  const sr=document.getElementById('adultSubRow');
+  if(cat==='adult'){
+    sr.classList.add('show');
+    document.querySelectorAll('.sub-pill').forEach(p=>p.classList.remove('active'));
+    document.querySelector('.sub-pill').classList.add('active');
+  } else {
+    sr.classList.remove('show');
+  }
+  loadComics(1);
+}
+function selectAdultSub(el,sub){
+  document.querySelectorAll('.sub-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  currentAdultSub=sub;
+  loadComics(1);
+}
+
 async function loadComics(page){
-  if(!page)page=1;pg.comics.page=page;
+  if(!page)page=1;
+  pg.comics.page=page;
   const grid=document.getElementById('comicsGrid'),heading=document.getElementById('comicsHeading');
-  const mL={superhero:'Superhero',manga:'Manga',horror:'Horror','sci-fi':'Sci-Fi',fantasy:'Fantasy',romance:'Romance',war:'War',western:'Western',crime:'Crime',adult:'Adult'},sL={all:'Adult',straight:'Straight',gay:'Gay',lesbian:'Lesbian',trans:'Trans',bisexual:'Bisexual',interracial:'Interracial',milf:'MILF',bbw:'BBW',bdsm:'BDSM',hentai:'Hentai',underground:'Underground'};
+  const mL={superhero:'Superhero',manga:'Manga',horror:'Horror','sci-fi':'Sci-Fi',fantasy:'Fantasy',romance:'Romance',war:'War',western:'Western',crime:'Crime',adult:'Adult'};
+  const sL={all:'Adult',straight:'Straight',gay:'Gay',lesbian:'Lesbian',trans:'Trans',bisexual:'Bisexual',interracial:'Interracial',milf:'MILF',bbw:'BBW',bdsm:'BDSM',hentai:'Hentai',underground:'Underground'};
   heading.textContent=(currentComicCat==='adult'?sL[currentAdultSub]:mL[currentComicCat])+' Comics';
   grid.innerHTML='<div class="loading"><div class="spinner"></div><span>Loading comics...</span></div>';
   document.getElementById('comicsPagination').innerHTML='';
-  const q=currentComicCat==='adult'?ADQ[currentAdultSub]||ADQ.all:CQ[currentComicCat]||'mediatype:texts AND subject:comics';
-  const start=(page-1)*pg.comics.perPage;
+
+  const q = currentComicCat==='adult' ? ADQ[currentAdultSub]||ADQ.all : CQ[currentComicCat]||CQ.superhero;
+  // Use true pagination offset — multiply page by perPage for start
+  const perPage = pg.comics.perPage;
+  const start = (page-1) * perPage;
+
+  // Sort by title on page 1 for variety, by downloads on subsequent pages
+  const sortField = page===1 ? 'title+asc' : 'downloads+desc';
+
   try{
-    const ctrl=new AbortController();setTimeout(()=>ctrl.abort(),11000);
-    const r=await fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier,title,creator,date,subject&rows=${pg.comics.perPage}&start=${start}&output=json&sort[]=downloads+desc`,{signal:ctrl.signal});if(!r.ok)throw 0;
-    const d=await r.json();const resp=d.response||{};const total=resp.numFound||0;
-    const seen=new Set();let docs=(resp.docs||[]).filter(x=>{if(seen.has(x.identifier))return false;seen.add(x.identifier);return true;});
+    const ctrl=new AbortController();
+    setTimeout(()=>ctrl.abort(), 13000);
+    const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier,title,creator,date,subject&rows=${perPage}&start=${start}&output=json&sort[]=${sortField}`;
+    const r=await fetch(url,{signal:ctrl.signal});
+    if(!r.ok) throw new Error('Bad response');
+    const d=await r.json();
+    const resp=d.response||{};
+    const total=resp.numFound||0;
+    const seen=new Set();
+    let docs=(resp.docs||[]).filter(x=>{
+      if(seen.has(x.identifier)) return false;
+      seen.add(x.identifier);
+      return true;
+    });
+
+    if(!docs.length && page===1){
+      // Try a broader fallback query for this category
+      const fallbackQ = currentComicCat==='adult'
+        ? 'mediatype:texts AND subject:erotica'
+        : `mediatype:texts AND subject:comics AND subject:${currentComicCat}`;
+      const ctrl2=new AbortController(); setTimeout(()=>ctrl2.abort(),10000);
+      const r2=await fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(fallbackQ)}&fl[]=identifier,title,creator,date&rows=${perPage}&start=0&output=json&sort[]=downloads+desc`,{signal:ctrl2.signal});
+      if(r2.ok){
+        const d2=await r2.json();
+        const s2=new Set();
+        docs=((d2.response&&d2.response.docs)||[]).filter(x=>{if(s2.has(x.identifier))return false;s2.add(x.identifier);return true;});
+        const tot2=(d2.response&&d2.response.numFound)||0;
+        grid.innerHTML=docs.length?docs.map(buildComicCard).join(''):'<div class="empty"><div class="ei">💥</div><p>No comics found in this category.</p></div>';
+        if(docs.length) renderPagination('comicsPagination',page,tot2,perPage,'loadComics');
+        return;
+      }
+    }
+
     if(!docs.length){
-      const fb=await fetch(`https://archive.org/advancedsearch.php?q=mediatype:texts+AND+subject:comics&fl[]=identifier,title,creator,date&rows=${pg.comics.perPage}&start=${start}&output=json&sort[]=downloads+desc`);
-      const fd=await fb.json();const s2=new Set();docs=((fd.response&&fd.response.docs)||[]).filter(x=>{if(s2.has(x.identifier))return false;s2.add(x.identifier);return true;});
-      const tot2=(fd.response&&fd.response.numFound)||0;
-      grid.innerHTML=docs.length?docs.map(buildComicCard).join(''):'<div class="empty"><div class="ei">💥</div><p>No comics found.</p></div>';
-      if(docs.length)renderPagination('comicsPagination',page,tot2,pg.comics.perPage,'loadComics');
+      grid.innerHTML='<div class="empty"><div class="ei">💥</div><p>No more comics in this category.</p></div>';
       return;
     }
-    grid.innerHTML=docs.map(buildComicCard).join('');renderPagination('comicsPagination',page,total,pg.comics.perPage,'loadComics');
-    if(page>1)scrollTop('page-comics');
-  }catch(e){grid.innerHTML='<div class="empty"><div class="ei">⚠️</div><p>Could not load comics.</p></div>';}
+
+    grid.innerHTML=docs.map(buildComicCard).join('');
+    renderPagination('comicsPagination',page,total,perPage,'loadComics');
+    if(page>1) scrollTop('page-comics');
+
+  }catch(e){
+    grid.innerHTML='<div class="empty"><div class="ei">⚠️</div><p>Could not load comics.</p><button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="loadComics('+page+')">↺ Retry</button></div>';
+  }
 }
 function buildComicCard(d){
   const title=d.title||'Unknown Comic',creator=Array.isArray(d.creator)?d.creator[0]:(d.creator||''),year=d.date?d.date.substring(0,4):'',id=d.identifier,cover=`https://archive.org/services/img/${id}`;
