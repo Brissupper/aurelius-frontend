@@ -545,10 +545,8 @@ html,body{height:100%;overflow:hidden;font-family:'Lato',sans-serif;background:v
 const ADMIN_EMAIL = 'joselineolan81@gmail.com';
 const ADMIN_PASSWORD = 'Aurelius@Admin2024';
 const GOOGLE_CLIENT_ID = '1017805317287-me5v533ju9kd0vcjq7d8u5add8mpniha.apps.googleusercontent.com';
-// ============ ADMIN EMAIL ============
-const API_BASE ='https://aurelius-qafo.onrender.com';
-const API = API_BASE + '/api';
-const AUTH = API_BASE + '/auth';
+const API = window.location.origin + '/api';
+const AUTH = window.location.origin + '/auth';
 
 let backendToken = localStorage.getItem('au_backend_token') || null;
 
@@ -817,7 +815,45 @@ function renderMessages(){
 
 // ============ LIBRARY ============
 function handleUpload(event){const file=event.target.files[0];if(!file)return;const entry={id:Date.now(),title:file.name.replace(/\.[^.]+$/,''),author:'Uploaded',size:(file.size/1024/1024).toFixed(1)+' MB',type:file.name.split('.').pop().toUpperCase(),date:new Date().toLocaleDateString(),dataUrl:null};const reader=new FileReader();reader.onload=e=>{entry.dataUrl=e.target.result;uploadedBooks.unshift(entry);saveLibrary();renderLibrary();toast('Uploaded: '+entry.title,'success');};reader.readAsDataURL(file);event.target.value='';}
-function renderLibrary(){const grid=document.getElementById('libraryGrid'),count=document.getElementById('uploadedCount');count.textContent=uploadedBooks.length+' book'+(uploadedBooks.length!==1?'s':'');if(!uploadedBooks.length){grid.innerHTML='<div class="empty"><div class="ei">📚</div><p>No uploads yet.</p></div>';return;}grid.innerHTML=uploadedBooks.map(b=>`<div class="book-card"><div class="book-cover-placeholder">📄</div><div class="book-info"><div class="book-title">${escHtml(b.title)}</div><div class="book-author" style="margin-bottom:8px">${b.type} · ${b.size}</div><div style="display:flex;gap:6px;flex-wrap:wrap;">${b.dataUrl?`<button class="btn btn-sm btn-primary" onclick="readUploaded(${b.id})">📖 Read</button>`:''}<button class="btn btn-sm btn-ghost" onclick="narrateUploaded(${b.id},'${escJs(b.title)}','${b.type||''}')">🎙️ Narrate</button><button class="btn btn-sm btn-ghost" onclick="openNarration('${escJs(b.title)}','Uploaded','uploaded',${b.id},'${b.type||''}')">🎧 Listen</button><button class="btn btn-sm btn-ghost" onclick="removeUploaded(${b.id})">🗑️</button></div></div></div>`).join('');}
+async function renderLibrary(){
+  const grid=document.getElementById('libraryGrid'),count=document.getElementById('uploadedCount');
+  count.textContent=uploadedBooks.length+' book'+(uploadedBooks.length!==1?'s':'');
+  if(!uploadedBooks.length){grid.innerHTML='<div class="empty"><div class="ei">📚</div><p>No uploads yet.</p></div>';return;}
+  // Check which books have saved narrations
+  const cached = await listCachedNarrations();
+  const cachedIds = new Set(cached.map(c => String(c.id)));
+  grid.innerHTML=uploadedBooks.map(b=>{
+    const hasCached = cachedIds.has(String(b.id));
+    return `<div class="book-card"><div class="book-cover-placeholder">📄</div><div class="book-info"><div class="book-title">${escHtml(b.title)}</div><div class="book-author" style="margin-bottom:8px">${b.type} · ${b.size}${hasCached?' · <span style="color:var(--success);font-size:.7rem">✅ Audio saved</span>':''}</div><div style="display:flex;gap:6px;flex-wrap:wrap;">${b.dataUrl?`<button class="btn btn-sm btn-primary" onclick="readUploaded(${b.id})">📖 Read</button>`:''}<button class="btn btn-sm btn-ghost" onclick="narrateUploaded(${b.id},'${escJs(b.title)}','${b.type||''}')">🎙️ Narrate</button>${hasCached?`<button class="btn btn-sm btn-primary" onclick="resumeNarration(${b.id})">🎧 Listen</button><button class="btn btn-sm btn-ghost btn-danger" onclick="deleteNarrationCache(${b.id})" title="Delete saved audio">🗑️ Audio</button>`:`<button class="btn btn-sm btn-ghost" onclick="openNarration('${escJs(b.title)}','Uploaded','uploaded',${b.id},'${b.type||''}')">🎧 Listen</button>`}<button class="btn btn-sm btn-ghost" onclick="removeUploaded(${b.id})">🗑️</button></div></div></div>`;
+  }).join('');
+}
+async function resumeNarration(bookId) {
+  const cached = await loadNarrationFromCache(bookId);
+  if (!cached || !cached.sentences || !cached.sentences.length) {
+    toast('No saved audio found', 'error'); return;
+  }
+  npState.bookId     = String(bookId);
+  npState.bookTitle  = cached.title;
+  npState.bookAuthor = cached.author;
+  npState._sentences = cached.sentences;
+  npState._voice     = window.speechSynthesis.getVoices().find(v=>v.lang.startsWith('en')) || window.speechSynthesis.getVoices()[0];
+  openBrowserPlayer(cached.title, cached.author, cached.sentences, npState._voice);
+  // Resume from saved position
+  if (cached.currentIdx > 0) {
+    tts.currentIdx = cached.currentIdx;
+    const pct = Math.round((cached.currentIdx / cached.sentences.length) * 100);
+    document.getElementById('narrateProgressFill').style.width = pct + '%';
+    document.getElementById('narratePos').textContent = pct + '%';
+    document.getElementById('narrateStatus').textContent = 'Paused at ' + pct + '% · ' + cached.sentences.length + ' sentences';
+    toast('Resuming from where you left off', 'info');
+  }
+}
+async function deleteNarrationCache(bookId) {
+  if (!confirm('Delete saved audio for this book?')) return;
+  await deleteNarrationFromCache(bookId);
+  toast('Saved audio deleted', 'info');
+  renderLibrary();
+}
 function readUploaded(id){const b=uploadedBooks.find(x=>x.id===id);if(!b||!b.dataUrl)return;if(b.type==='PDF'){document.getElementById('readerTitle').textContent=b.title;document.getElementById('readerFrame').src=b.dataUrl;document.getElementById('readerOpenLink').href=b.dataUrl;openModal('readerModal');}else{const w=window.open('','_blank');if(w)w.document.write(`<html><head><title>${escHtml(b.title)}</title><meta charset="UTF-8"><style>body{font-family:Georgia,serif;max-width:720px;margin:40px auto;padding:20px;line-height:1.8;}</style></head><body><h1>${escHtml(b.title)}</h1><pre style="white-space:pre-wrap">${escHtml(atob(b.dataUrl.split(',')[1]))}</pre></body></html>`);}}
 function removeUploaded(id){uploadedBooks=uploadedBooks.filter(b=>b.id!==id);saveLibrary();renderLibrary();}
 function clearLibrary(){if(confirm('Remove all uploaded books?')){uploadedBooks=[];saveLibrary();renderLibrary();toast('Library cleared','info');}}
@@ -975,7 +1011,8 @@ async function openNarration(title,author,src,id,extra){
 function toggleNarration(){tts.isPlaying?pauseNarration():playNarration();}
 function playNarration(){if(!('speechSynthesis' in window)){toast('Text-to-speech not supported','error');return;}if(tts.currentIdx>=tts.sentences.length)tts.currentIdx=0;speakFrom(tts.currentIdx);}
 function speakFrom(idx){window.speechSynthesis.cancel();tts.isPlaying=true;document.getElementById('narratePlayBtn').textContent='⏸';document.getElementById('narrateStatus').textContent='Playing...';speakSentence(idx);}
-function speakSentence(idx){if(idx>=tts.sentences.length){tts.isPlaying=false;tts.currentIdx=0;document.getElementById('narratePlayBtn').textContent='▶';document.getElementById('narrateStatus').textContent='Finished';document.getElementById('narrateProgressFill').style.width='100%';document.getElementById('narratePos').textContent='100%';return;}tts.currentIdx=idx;const sentence=tts.sentences[idx];const pct=Math.round((idx/tts.sentences.length)*100);document.getElementById('narrateProgressFill').style.width=pct+'%';document.getElementById('narratePos').textContent=pct+'%';const preview=document.getElementById('narratePreview');const tp=tts.fullText.indexOf(sentence.substring(0,40));if(tp!==-1&&tp<400){preview.innerHTML=escHtml(tts.fullText.substring(0,tp))+`<span class="highlight">${escHtml(sentence)}</span>`+escHtml(tts.fullText.substring(tp+sentence.length,400));preview.querySelector('.highlight')?.scrollIntoView({block:'nearest'});}const u=new SpeechSynthesisUtterance(sentence);u.rate=parseFloat(document.getElementById('narrateSpeed')?.value||'1');const vs=document.getElementById('narrateVoice');if(vs&&tts.voices[vs.value])u.voice=tts.voices[vs.value];u.onend=()=>{if(tts.isPlaying)speakSentence(idx+1);};u.onerror=()=>{if(tts.isPlaying)speakSentence(idx+1);};tts.utterance=u;window.speechSynthesis.speak(u);}
+function speakSentence(idx){if(idx>=tts.sentences.length){tts.isPlaying=false;tts.currentIdx=0;document.getElementById('narratePlayBtn').textContent='▶';document.getElementById('narrateStatus').textContent='Finished';document.getElementById('narrateProgressFill').style.width='100%';document.getElementById('narratePos').textContent='100%';if(npState.bookId)saveNarrationToCache(npState.bookId,npState.bookTitle,npState.bookAuthor,tts.sentences,0);return;}tts.currentIdx=idx;// Save position every 20 sentences
+if(idx%20===0&&npState.bookId)saveNarrationToCache(npState.bookId,npState.bookTitle,npState.bookAuthor,tts.sentences,idx);const sentence=tts.sentences[idx];const pct=Math.round((idx/tts.sentences.length)*100);document.getElementById('narrateProgressFill').style.width=pct+'%';document.getElementById('narratePos').textContent=pct+'%';const preview=document.getElementById('narratePreview');const tp=tts.fullText.indexOf(sentence.substring(0,40));if(tp!==-1&&tp<400){preview.innerHTML=escHtml(tts.fullText.substring(0,tp))+`<span class="highlight">${escHtml(sentence)}</span>`+escHtml(tts.fullText.substring(tp+sentence.length,400));preview.querySelector('.highlight')?.scrollIntoView({block:'nearest'});}const u=new SpeechSynthesisUtterance(sentence);u.rate=parseFloat(document.getElementById('narrateSpeed')?.value||'1');const vs=document.getElementById('narrateVoice');if(vs&&tts.voices[vs.value])u.voice=tts.voices[vs.value];u.onend=()=>{if(tts.isPlaying)speakSentence(idx+1);};u.onerror=()=>{if(tts.isPlaying)speakSentence(idx+1);};tts.utterance=u;window.speechSynthesis.speak(u);}
 function pauseNarration(){window.speechSynthesis.cancel();tts.isPlaying=false;document.getElementById('narratePlayBtn').textContent='▶';document.getElementById('narrateStatus').textContent='Paused';}
 function stopNarration(){window.speechSynthesis.cancel();tts.isPlaying=false;tts.currentIdx=0;const b=document.getElementById('narratePlayBtn');if(b)b.textContent='▶';}
 function rewindNarration(){const was=tts.isPlaying;window.speechSynthesis.cancel();tts.isPlaying=false;tts.currentIdx=Math.max(0,tts.currentIdx-5);if(was)speakFrom(tts.currentIdx);else{const p=Math.round((tts.currentIdx/Math.max(1,tts.sentences.length))*100);document.getElementById('narrateProgressFill').style.width=p+'%';document.getElementById('narratePos').textContent=p+'%';}}
@@ -1406,6 +1443,16 @@ function onNarrationComplete() {
   document.querySelector('#narrateProgressModal .modal-body > div:first-child').style.display = 'none';
   document.getElementById('npDoneState').style.display = 'block';
   toast('Audiobook ready! 🎉', 'success');
+  // Auto-save narration to IndexedDB so it persists across sessions
+  if (npState._sentences && npState._sentences.length > 0) {
+    saveNarrationToCache(
+      npState.bookId,
+      npState.bookTitle,
+      npState.bookAuthor,
+      npState._sentences,
+      0
+    );
+  }
 }
 
 function goListenNow() {
@@ -1500,30 +1547,95 @@ async function extractPdfText(dataUrl){
   const numPages=pdf.numPages;
   let fullText='';
 
-  // Extract up to 300 pages with proper word spacing preserved
-  const maxPages=Math.min(numPages,300);
-  for(let p=1;p<=maxPages;p++){
+  // Extract ALL pages with no character limit
+  for(let p=1;p<=numPages;p++){
     const page=await pdf.getPage(p);
     const tc=await page.getTextContent();
-
     let pageText='';
     let lastY=null;
     for(const item of tc.items){
-      if(lastY!==null&&Math.abs(item.transform[5]-lastY)>5){
-        pageText+='\n';
-      }
+      if(lastY!==null&&Math.abs(item.transform[5]-lastY)>5){ pageText+='\n'; }
       pageText+=item.str;
       if(item.hasEOL) pageText+='\n';
       lastY=item.transform[5];
     }
-
     fullText+=pageText+'\n';
-    if(fullText.length>200000){
-      fullText+='\n\n[End of sample — book continues]';
-      break;
-    }
   }
   return fullText.trim();
+}
+
+
+// ============ INDEXED DB — AUDIO CACHE ============
+// Saves narration (sentences + position) per book so it persists across sessions.
+// Deleted only when the user explicitly removes it.
+
+const AUDIO_DB_NAME = 'aurelius_audio';
+const AUDIO_DB_VER  = 1;
+
+function openAudioDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(AUDIO_DB_NAME, AUDIO_DB_VER);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('narrations')) {
+        db.createObjectStore('narrations', { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function saveNarrationToCache(bookId, title, author, sentences, currentIdx) {
+  try {
+    const db = await openAudioDB();
+    const tx = db.transaction('narrations', 'readwrite');
+    tx.objectStore('narrations').put({
+      id: String(bookId),
+      title, author, sentences, currentIdx,
+      savedAt: new Date().toISOString()
+    });
+    await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
+    db.close();
+  } catch(e) { console.warn('Audio cache save failed:', e); }
+}
+
+async function loadNarrationFromCache(bookId) {
+  try {
+    const db = await openAudioDB();
+    const tx = db.transaction('narrations', 'readonly');
+    const result = await new Promise((res, rej) => {
+      const req = tx.objectStore('narrations').get(String(bookId));
+      req.onsuccess = () => res(req.result);
+      req.onerror   = () => rej(req.error);
+    });
+    db.close();
+    return result || null;
+  } catch(e) { return null; }
+}
+
+async function deleteNarrationFromCache(bookId) {
+  try {
+    const db = await openAudioDB();
+    const tx = db.transaction('narrations', 'readwrite');
+    tx.objectStore('narrations').delete(String(bookId));
+    await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
+    db.close();
+  } catch(e) {}
+}
+
+async function listCachedNarrations() {
+  try {
+    const db = await openAudioDB();
+    const tx = db.transaction('narrations', 'readonly');
+    const result = await new Promise((res, rej) => {
+      const req = tx.objectStore('narrations').getAll();
+      req.onsuccess = () => res(req.result);
+      req.onerror   = () => rej(req.error);
+    });
+    db.close();
+    return result || [];
+  } catch(e) { return []; }
 }
 
 // ============ INIT ============
