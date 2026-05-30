@@ -858,6 +858,27 @@ function readUploaded(id){const b=uploadedBooks.find(x=>x.id===id);if(!b||!b.dat
 function removeUploaded(id){uploadedBooks=uploadedBooks.filter(b=>b.id!==id);saveLibrary();renderLibrary();}
 function clearLibrary(){if(confirm('Remove all uploaded books?')){uploadedBooks=[];saveLibrary();renderLibrary();toast('Library cleared','info');}}
 
+
+// ============ SAVE BOOK (Downloads) ============
+function saveBook(jsonStr){
+  let b;
+  try{ b = typeof jsonStr==='string' ? JSON.parse(jsonStr) : jsonStr; }catch{ return; }
+  if(!b || !b.id){ toast('Could not save book','error'); return; }
+  if(savedBooks.some(s=>String(s.id)===String(b.id))){
+    toast('Already saved','info'); return;
+  }
+  savedBooks.unshift({...b, savedAt: new Date().toLocaleDateString()});
+  saveDownloads();
+  toast('Saved to Downloads ✅','success');
+  // Update any open modal Save button to show saved state
+  document.querySelectorAll('#bookModalActions .btn-ghost, #comicModalActions .btn-ghost').forEach(btn=>{
+    if(btn.textContent.includes('Save')){
+      btn.textContent='✅ Saved';
+      btn.disabled=true;
+    }
+  });
+}
+
 // ============ DOWNLOADS — FIXED: passes formats JSON to narrate button ============
 function renderDownloads(){
   const list=document.getElementById('downloadsList'),count=document.getElementById('downloadsCount'),btn=document.getElementById('clearDownloadsBtn');
@@ -870,7 +891,7 @@ function renderDownloads(){
     const icon=b.src==='comic'?'💥':b.src==='archive'?'🏛️':'📖';
     const ns=(b.src==='archive'||b.src==='comic')?'archive':'gutenberg';
     const formatsJson=b.formats?escAttr(JSON.stringify(b.formats)):'';
-    return `<div class="download-item"><div class="di-icon">${icon}</div><div class="di-info"><div class="di-title">${escHtml(b.title)}</div><div class="di-meta">${escHtml(b.author||'')} · ${b.src||'book'}${b.savedAt?' · Saved '+b.savedAt:''}</div></div><div class="di-actions">${readUrl?`<button class="btn btn-sm btn-primary" onclick="openReader('${escJs(readUrl)}','${escJs(b.title)}')">📖 Read</button>`:''}<button class="btn btn-sm btn-ghost" onclick="startNarrateFlow('${escJs(String(b.id))}','${escJs(b.title)}','${escJs(b.author||'')}','${escJs(readUrl)}','${b.src||''}','${formatsJson}')">🎙️ Narrate</button><button class="btn btn-sm btn-ghost" onclick="openNarration('${escJs(b.title)}','${escJs(b.author||'')}','${ns}','${escJs(String(b.id))}','')">🎧 Listen</button><button class="btn btn-sm btn-ghost" onclick="removeDownload('${escJs(String(b.id))}')">🗑️</button></div></div>`;
+    return `<div class="download-item"><div class="di-icon">${icon}</div><div class="di-info"><div class="di-title">${escHtml(b.title)}</div><div class="di-meta">${escHtml(b.author||'')} · ${b.src||'book'}${b.savedAt?' · Saved '+b.savedAt:''}</div></div><div class="di-actions">${readUrl?`<button class="btn btn-sm btn-primary" onclick="openReader('${escJs(readUrl)}','${escJs(b.title)}')">📖 Read</button>`:''}<button class="btn btn-sm btn-ghost" onclick="startNarrateFlow('${escJs(String(b.id))}','${escJs(b.title)}','${escJs(b.author||'')}','${escJs(readUrl)}','${b.src||''}','${formatsJson}')">🎙️ Narrate</button><button class="btn btn-sm btn-ghost" onclick="checkAndResume('${escJs(String(b.id))}','${escJs(b.title)}','${escJs(b.author||'')}')">🎧 Listen</button><button class="btn btn-sm btn-ghost" onclick="removeDownload('${escJs(String(b.id))}')">🗑️</button></div></div>`;
   }).join('')+'</div>';
 }
 function removeDownload(id){savedBooks=savedBooks.filter(b=>String(b.id)!==String(id));saveDownloads();renderDownloads();}
@@ -1164,7 +1185,14 @@ async function browserNarrationWithProgress(title, author, src, bookId, formats)
           const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 10000);
           const data = await (await fetch(`https://gutendex.com/books/${bookId}`, {signal: ctrl.signal})).json();
           const f = data.formats || {};
-          textUrl = f['text/plain; charset=utf-8'] || f['text/plain'] || f['text/html'] || f['application/xhtml+xml'] || '';
+          // Priority: utf-8 plain text first, then other text formats
+          textUrl = f['text/plain; charset=utf-8']
+                 || f['text/plain; charset=us-ascii']
+                 || f['text/plain']
+                 || f['text/html; charset=utf-8']
+                 || f['text/html']
+                 || f['application/xhtml+xml']
+                 || '';
         } catch(e) {}
       }
 
@@ -1192,7 +1220,7 @@ async function browserNarrationWithProgress(title, author, src, bookId, formats)
                      .replace(/ {2,}/g, ' ').trim();
           }
 
-          text = raw.length > 150000 ? raw.substring(0, 150000) + '\n\n[End of sample]' : raw;
+          text = raw;
         } catch(fetchErr) {}
       }
 
@@ -1218,7 +1246,7 @@ async function browserNarrationWithProgress(title, author, src, bookId, formats)
             if (tr.ok) {
               let raw = await tr.text();
               raw = raw.replace(/\f/g, '\n').replace(/\r\n/g, '\n').replace(/\n{4,}/g, '\n\n').replace(/- \n/g, '').replace(/ {3,}/g, '  ').trim();
-              text = raw.length > 150000 ? raw.substring(0, 150000) + '\n\n[End of sample]' : raw;
+              text = raw;
             }
           } catch(e2) {}
         }
@@ -1228,6 +1256,8 @@ async function browserNarrationWithProgress(title, author, src, bookId, formats)
           const tryUrls = [
             `https://archive.org/download/${bookId}/${bookId}_djvu.txt`,
             `https://archive.org/download/${bookId}/${bookId}.txt`,
+            `https://archive.org/download/${bookId}/${bookId}_full.txt`,
+            `https://archive.org/download/${bookId}/${bookId}_text.txt`,
           ];
           for (const u of tryUrls) {
             try {
@@ -1236,7 +1266,7 @@ async function browserNarrationWithProgress(title, author, src, bookId, formats)
                 let raw2 = await tr2.text();
                 if (raw2.length > 300) {
                   raw2 = raw2.replace(/\f/g, '\n').replace(/\r\n/g, '\n').replace(/\n{4,}/g, '\n\n').replace(/- \n/g, '').trim();
-                  text = raw2.length > 150000 ? raw2.substring(0, 150000) : raw2;
+                  text = raw2;
                   break;
                 }
               }
@@ -1564,6 +1594,33 @@ async function extractPdfText(dataUrl){
   return fullText.trim();
 }
 
+
+
+// Check IndexedDB cache first, then fall back to openNarration
+async function checkAndResume(bookId, title, author) {
+  const cached = await loadNarrationFromCache(bookId);
+  if (cached && cached.sentences && cached.sentences.length > 0) {
+    npState.bookId     = String(bookId);
+    npState.bookTitle  = cached.title || title;
+    npState.bookAuthor = cached.author || author;
+    npState._sentences = cached.sentences;
+    npState._voice     = window.speechSynthesis.getVoices().find(v=>v.lang.startsWith('en')) || window.speechSynthesis.getVoices()[0];
+    openBrowserPlayer(cached.title || title, cached.author || author, cached.sentences, npState._voice);
+    if (cached.currentIdx > 0) {
+      tts.currentIdx = cached.currentIdx;
+      const pct = Math.round((cached.currentIdx / cached.sentences.length) * 100);
+      document.getElementById('narrateProgressFill').style.width = pct + '%';
+      document.getElementById('narratePos').textContent = pct + '%';
+      document.getElementById('narrateStatus').textContent = 'Resuming at ' + pct + '% · ' + cached.sentences.length + ' sentences';
+      toast('Resuming from ' + pct + '%', 'info');
+    }
+  } else {
+    // No cache — determine src from saved book
+    const b = savedBooks.find(x => String(x.id) === String(bookId));
+    const ns = (b && (b.src === 'archive' || b.src === 'comic')) ? 'archive' : 'gutenberg';
+    openNarration(title, author, ns, bookId, '');
+  }
+}
 
 // ============ INDEXED DB — AUDIO CACHE ============
 // Saves narration (sentences + position) per book so it persists across sessions.
