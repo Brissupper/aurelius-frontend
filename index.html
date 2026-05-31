@@ -165,6 +165,23 @@ html,body{height:100%;overflow:hidden;font-family:'Lato',sans-serif;background:v
 .narrate-voice select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-family:'Lato',sans-serif;max-width:200px;}
 .result-count{font-size:.85rem;color:var(--muted);margin-bottom:16px;}
 #npCircle{transition:stroke-dashoffset 1s ease;}
+.region-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px;}
+.region-card{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:20px 14px;text-align:center;cursor:pointer;transition:transform .2s,border-color .2s;}
+.region-card:hover{transform:translateY(-3px);border-color:var(--accent);}
+.region-card .rc-icon{font-size:2.2rem;margin-bottom:8px;}
+.region-card .rc-name{font-family:'Cinzel',serif;font-size:.85rem;color:var(--accent);margin-bottom:4px;}
+.region-card .rc-count{font-size:.72rem;color:var(--muted);}
+.myth-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px;}
+.myth-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .2s,border-color .2s;}
+.myth-card:hover{transform:translateY(-3px);border-color:var(--accent);}
+.myth-cover{width:100%;aspect-ratio:2/3;object-fit:cover;background:var(--border);display:block;}
+.myth-cover-ph{width:100%;aspect-ratio:2/3;display:flex;align-items:center;justify-content:center;font-size:2.5rem;}
+.myth-info{padding:10px;}
+.myth-title{font-size:.82rem;font-weight:700;margin-bottom:4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.myth-origin{font-size:.72rem;color:var(--muted);}
+.timeline-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.era-pill{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:.78rem;cursor:pointer;transition:all .15s;touch-action:manipulation;}
+.era-pill:hover,.era-pill.active{background:rgba(201,168,76,.2);border-color:var(--accent);color:var(--accent);}
 .msg-unread-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:6px;flex-shrink:0;}
 .msg-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:12px;cursor:pointer;transition:border-color .2s;}
 .msg-card:hover{border-color:var(--accent);}
@@ -228,6 +245,8 @@ html,body{height:100%;overflow:hidden;font-family:'Lato',sans-serif;background:v
     <button class="nav-btn" id="nav-wikipedia" onclick="navTo('wikipedia')"><span class="icon">&#127758;</span> Wikipedia</button>
     <button class="nav-btn" id="nav-newspapers" onclick="navTo('newspapers')"><span class="icon">&#128240;</span> Newspapers</button>
     <button class="nav-btn" id="nav-airecommend" onclick="navTo('airecommend')"><span class="icon">&#129302;</span> AI Recommend</button>
+    <button class="nav-btn" id="nav-history" onclick="navTo('history')"><span class="icon">&#127963;&#65039;</span> History Archive</button>
+    <button class="nav-btn" id="nav-mythology" onclick="navTo('mythology')"><span class="icon">&#9939;&#65039;</span> Mythology</button>
     <button class="nav-btn" id="nav-messages" onclick="navTo('messages')"><span class="icon">&#9993;&#65039;</span> Messages<span class="msg-badge" id="msgBadge">0</span></button>
   </div>
   <div class="nav-section">
@@ -411,6 +430,126 @@ html,body{height:100%;overflow:hidden;font-family:'Lato',sans-serif;background:v
         <h3>About</h3>
         <div class="setting-row"><label>Version</label><span style="color:var(--muted)">2.0.0</span></div>
         <div class="setting-row"><label>Built on</label><span style="color:var(--muted)">Project Gutenberg + Internet Archive</span></div>
+      </div>
+    </div>
+
+    <!-- HISTORY ARCHIVE PAGE -->
+    <div class="page" id="page-history">
+      <div class="hero" style="padding:28px 32px;margin-bottom:24px;background:linear-gradient(135deg,#1a1a0e 0%,#0d0d05 60%,#1a1205 100%);">
+        <h1 style="font-size:1.4rem">&#127963;&#65039; World History Archive</h1>
+        <p>Explore the complete story of humanity — every continent, every era, every civilization.</p>
+      </div>
+
+      <!-- Region selector -->
+      <div id="historyRegionView">
+        <div class="section-hdr" style="margin-bottom:14px;"><h2>&#127758; Browse by Region</h2></div>
+        <div class="region-grid" id="historyRegionGrid">
+          <div class="region-card" onclick="loadHistoryRegion('africa')"><div class="rc-icon">&#127745;</div><div class="rc-name">Africa</div><div class="rc-count">Ancient Egypt · Nubia · Mali · Zulu</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('north-america')"><div class="rc-icon">&#127482;&#127480;</div><div class="rc-name">North America</div><div class="rc-count">Maya · Aztec · Colonial · Civil War</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('south-america')"><div class="rc-icon">&#127463;&#127479;</div><div class="rc-name">South America</div><div class="rc-count">Inca · Amazon · Spanish Conquest</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('europe')"><div class="rc-icon">&#127466;&#127482;</div><div class="rc-name">Europe</div><div class="rc-count">Greece · Rome · Medieval · WWI · WWII</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('asia')"><div class="rc-icon">&#127470;&#127475;</div><div class="rc-name">Asia</div><div class="rc-count">China · Japan · India · Silk Road</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('middle-east')"><div class="rc-icon">&#127462;&#127466;</div><div class="rc-name">Middle East</div><div class="rc-count">Mesopotamia · Persia · Ottoman · Islam</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('oceania')"><div class="rc-icon">&#127462;&#127482;</div><div class="rc-name">Oceania</div><div class="rc-count">Aboriginal · Polynesia · New Zealand</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('ancient')"><div class="rc-icon">&#127981;</div><div class="rc-name">Ancient World</div><div class="rc-count">Mesopotamia · Babylon · Phoenicia</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('medieval')"><div class="rc-icon">&#127984;&#65039;</div><div class="rc-name">Medieval</div><div class="rc-count">Crusades · Feudalism · Black Death</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('modern')"><div class="rc-icon">&#128481;&#65039;</div><div class="rc-name">Modern Era</div><div class="rc-count">WWI · WWII · Cold War · Independence</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('science-history')"><div class="rc-icon">&#9878;&#65039;</div><div class="rc-name">History of Science</div><div class="rc-count">Enlightenment · Industrial · Space Age</div></div>
+          <div class="region-card" onclick="loadHistoryRegion('biography-history')"><div class="rc-icon">&#128081;</div><div class="rc-name">Historical Figures</div><div class="rc-count">Leaders · Conquerors · Revolutionaries</div></div>
+        </div>
+
+        <!-- Era timeline -->
+        <div class="section-hdr" style="margin-bottom:10px;"><h2>&#8987; Browse by Era</h2></div>
+        <div class="timeline-bar">
+          <button class="era-pill" onclick="loadHistoryEra('prehistoric','Prehistoric')">&#129432; Prehistoric</button>
+          <button class="era-pill" onclick="loadHistoryEra('ancient civilizations','Ancient (3000–500 BCE)')">&#127981; Ancient</button>
+          <button class="era-pill" onclick="loadHistoryEra('classical antiquity','Classical (500 BCE–500 CE)')">&#127793; Classical</button>
+          <button class="era-pill" onclick="loadHistoryEra('medieval history','Medieval (500–1500)')">&#127984;&#65039; Medieval</button>
+          <button class="era-pill" onclick="loadHistoryEra('renaissance exploration','Renaissance (1300–1700)')">&#127912; Renaissance</button>
+          <button class="era-pill" onclick="loadHistoryEra('early modern history','Early Modern (1500–1800)')">&#9874;&#65039; Early Modern</button>
+          <button class="era-pill" onclick="loadHistoryEra('industrial revolution','Industrial (1760–1900)')">&#9881;&#65039; Industrial</button>
+          <button class="era-pill" onclick="loadHistoryEra('world war','20th Century Wars')">&#129686; World Wars</button>
+          <button class="era-pill" onclick="loadHistoryEra('cold war decolonization','Cold War Era')">&#9760;&#65039; Cold War</button>
+          <button class="era-pill" onclick="loadHistoryEra('contemporary history','Contemporary')">&#127760; Contemporary</button>
+        </div>
+
+        <!-- Search -->
+        <div style="display:flex;gap:10px;margin-bottom:20px;">
+          <div class="search-wrap" style="flex:1"><span class="si">&#128269;</span><input type="search" id="historySearch" placeholder="Search history: empires, battles, revolutions..." onkeydown="if(event.key==='Enter')searchHistory(this.value)" style="width:100%"></div>
+          <button class="btn btn-primary" onclick="searchHistory(document.getElementById('historySearch').value)">Search</button>
+        </div>
+      </div>
+
+      <!-- Results view -->
+      <div id="historyResultsView" style="display:none">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <button class="btn btn-ghost btn-sm" onclick="backToHistoryRegions()">&#8592; All Regions</button>
+          <h2 id="historyResultsHeading" style="font-family:'Cinzel',serif;font-size:1rem;color:var(--accent)"></h2>
+        </div>
+        <div id="historyGrid" class="book-grid"><div class="loading"><div class="spinner"></div><span>Loading history...</span></div></div>
+        <div id="historyPagination"></div>
+      </div>
+    </div>
+
+    <!-- MYTHOLOGY PAGE -->
+    <div class="page" id="page-mythology">
+      <div class="hero" style="padding:28px 32px;margin-bottom:24px;background:linear-gradient(135deg,#1a0a2e 0%,#0d0520 60%,#200a1a 100%);">
+        <h1 style="font-size:1.4rem">&#9939;&#65039; World Mythology</h1>
+        <p>Gods, heroes, creation stories and legends from every culture on Earth.</p>
+      </div>
+
+      <!-- Mythology traditions -->
+      <div id="mythRegionView">
+        <div class="section-hdr" style="margin-bottom:14px;"><h2>&#127758; Mythological Traditions</h2></div>
+        <div class="region-grid" id="mythRegionGrid">
+          <div class="region-card" onclick="loadMythology('greek mythology')" style="background:linear-gradient(135deg,#1a1a2e,#0d0d1a)"><div class="rc-icon">&#9889;</div><div class="rc-name">Greek</div><div class="rc-count">Zeus · Odyssey · Hercules · Titans</div></div>
+          <div class="region-card" onclick="loadMythology('roman mythology')" style="background:linear-gradient(135deg,#2e1a0a,#1a0d05)"><div class="rc-icon">&#127981;</div><div class="rc-name">Roman</div><div class="rc-count">Jupiter · Aeneid · Mars · Venus</div></div>
+          <div class="region-card" onclick="loadMythology('norse mythology')" style="background:linear-gradient(135deg,#0a1a2e,#050d1a)"><div class="rc-icon">&#9883;&#65039;</div><div class="rc-name">Norse</div><div class="rc-count">Odin · Thor · Ragnarok · Valhalla</div></div>
+          <div class="region-card" onclick="loadMythology('egyptian mythology')" style="background:linear-gradient(135deg,#2e2a0a,#1a150d)"><div class="rc-icon">&#128334;</div><div class="rc-name">Egyptian</div><div class="rc-count">Ra · Osiris · Isis · Horus · Anubis</div></div>
+          <div class="region-card" onclick="loadMythology('hindu mythology vedas')" style="background:linear-gradient(135deg,#2e0a1a,#1a050d)"><div class="rc-icon">&#129490;</div><div class="rc-name">Hindu</div><div class="rc-count">Vishnu · Shiva · Mahabharata · Ramayana</div></div>
+          <div class="region-card" onclick="loadMythology('celtic mythology')" style="background:linear-gradient(135deg,#0a2e0a,#05150d)"><div class="rc-icon">&#9752;</div><div class="rc-name">Celtic</div><div class="rc-count">Druids · King Arthur · Cú Chulainn</div></div>
+          <div class="region-card" onclick="loadMythology('mesopotamian mythology sumerian')" style="background:linear-gradient(135deg,#2e1a0a,#150d05)"><div class="rc-icon">&#128016;</div><div class="rc-name">Mesopotamian</div><div class="rc-count">Gilgamesh · Enkidu · Marduk · Ishtar</div></div>
+          <div class="region-card" onclick="loadMythology('chinese mythology folklore')" style="background:linear-gradient(135deg,#2e0a0a,#1a0505)"><div class="rc-icon">&#129409;</div><div class="rc-name">Chinese</div><div class="rc-count">Dragon Kings · Sun Wukong · Nu Wa</div></div>
+          <div class="region-card" onclick="loadMythology('japanese mythology shinto')" style="background:linear-gradient(135deg,#2e0a1a,#150510)"><div class="rc-icon">&#127919;</div><div class="rc-name">Japanese</div><div class="rc-count">Amaterasu · Susanoo · Izanagi · Kami</div></div>
+          <div class="region-card" onclick="loadMythology('african mythology folklore')" style="background:linear-gradient(135deg,#1a2e0a,#0d150a)"><div class="rc-icon">&#127744;</div><div class="rc-name">African</div><div class="rc-count">Anansi · Oshun · Ogun · Yoruba · Zulu</div></div>
+          <div class="region-card" onclick="loadMythology('aztec mythology mesoamerican')" style="background:linear-gradient(135deg,#2e200a,#151005)"><div class="rc-icon">&#9728;&#65039;</div><div class="rc-name">Aztec &amp; Maya</div><div class="rc-count">Quetzalcoatl · Huitzilopochtli · Kukulcan</div></div>
+          <div class="region-card" onclick="loadMythology('native american mythology folklore')" style="background:linear-gradient(135deg,#0a2e1a,#05150d)"><div class="rc-icon">&#129413;</div><div class="rc-name">Native American</div><div class="rc-count">Coyote · Great Spirit · Thunderbird</div></div>
+          <div class="region-card" onclick="loadMythology('polynesian mythology')" style="background:linear-gradient(135deg,#0a1a2e,#050d1a)"><div class="rc-icon">&#127754;</div><div class="rc-name">Polynesian</div><div class="rc-count">Maui · Tangaroa · Tiki · Pacific Gods</div></div>
+          <div class="region-card" onclick="loadMythology('slavic mythology folklore')" style="background:linear-gradient(135deg,#1a0a2e,#0d0515)"><div class="rc-icon">&#10052;&#65039;</div><div class="rc-name">Slavic</div><div class="rc-count">Perun · Baba Yaga · Firebird · Leshy</div></div>
+          <div class="region-card" onclick="loadMythology('persian mythology zoroastrian')" style="background:linear-gradient(135deg,#2e1a0a,#150d05)"><div class="rc-icon">&#128293;</div><div class="rc-name">Persian</div><div class="rc-count">Ahura Mazda · Shahnameh · Rustam</div></div>
+          <div class="region-card" onclick="loadMythology('biblical mythology religion ancient')" style="background:linear-gradient(135deg,#1a1a2e,#0d0d15)"><div class="rc-icon">&#10024;</div><div class="rc-name">Biblical &amp; Abrahamic</div><div class="rc-count">Genesis · Angels · Apocrypha · Enoch</div></div>
+        </div>
+
+        <!-- Themes -->
+        <div class="section-hdr" style="margin-bottom:10px;"><h2>&#127775; Browse by Theme</h2></div>
+        <div class="timeline-bar">
+          <button class="era-pill" onclick="loadMythTheme('creation myth','Creation Myths')">&#127758; Creation</button>
+          <button class="era-pill" onclick="loadMythTheme('hero quest mythology','Hero Journeys')">&#9876;&#65039; Heroes</button>
+          <button class="era-pill" onclick="loadMythTheme('gods goddesses mythology','Gods &amp; Goddesses')">&#9889; Gods</button>
+          <button class="era-pill" onclick="loadMythTheme('underworld afterlife mythology','Underworld')">&#128128; Underworld</button>
+          <button class="era-pill" onclick="loadMythTheme('flood myth deluge','Flood Myths')">&#127754; Floods</button>
+          <button class="era-pill" onclick="loadMythTheme('trickster mythology folklore','Tricksters')">&#129400; Tricksters</button>
+          <button class="era-pill" onclick="loadMythTheme('dragon mythology','Dragons')">&#129409; Dragons</button>
+          <button class="era-pill" onclick="loadMythTheme('apocalypse mythology end of world','End of World')">&#9762;&#65039; Apocalypse</button>
+          <button class="era-pill" onclick="loadMythTheme('love myth romance gods','Love &amp; Fate')">&#128149; Love &amp; Fate</button>
+          <button class="era-pill" onclick="loadMythTheme('war mythology battle gods','War Myths')">&#129686; War</button>
+        </div>
+
+        <!-- Search -->
+        <div style="display:flex;gap:10px;margin:20px 0;">
+          <div class="search-wrap" style="flex:1"><span class="si">&#128269;</span><input type="search" id="mythSearch" placeholder="Search myths: gods, heroes, creatures..." onkeydown="if(event.key==='Enter')searchMythology(this.value)" style="width:100%"></div>
+          <button class="btn btn-primary" onclick="searchMythology(document.getElementById('mythSearch').value)">Search</button>
+        </div>
+      </div>
+
+      <!-- Results view -->
+      <div id="mythResultsView" style="display:none">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <button class="btn btn-ghost btn-sm" onclick="backToMythRegions()">&#8592; All Traditions</button>
+          <h2 id="mythResultsHeading" style="font-family:'Cinzel',serif;font-size:1rem;color:var(--accent)"></h2>
+        </div>
+        <div id="mythGrid" class="myth-grid"><div class="loading"><div class="spinner"></div><span>Loading mythology...</span></div></div>
+        <div id="mythPagination"></div>
       </div>
     </div>
 
@@ -747,6 +886,8 @@ function showPage(page){
   if(page==='messages')renderMessages();
   if(page==='requests')renderRequests();
   if(page==='airecommend'){/* loaded on demand */}
+  if(page==='history'){ document.getElementById('historyRegionView').style.display='block'; document.getElementById('historyResultsView').style.display='none'; }
+  if(page==='mythology'){ document.getElementById('mythRegionView').style.display='block'; document.getElementById('mythResultsView').style.display='none'; }
   if(page==='admin')renderAdminPage();
 }
 
@@ -2252,6 +2393,280 @@ function generateReason(title, prompt) {
 }
 
 // ============ SHOW PAGE — updated to handle new pages ============
+
+// ============================================================
+// HISTORY ARCHIVE
+// ============================================================
+
+// Region query map — precise Archive.org queries per region
+const HISTORY_REGIONS = {
+  'africa':            { label:'African History',         q:'subject:(africa OR african OR egypt OR nubia OR mali OR "zulu" OR "ashanti" OR "swahili" OR "great zimbabwe" OR "songhai" OR "carthage") AND (subject:history OR mediatype:texts) AND NOT subject:fiction AND NOT subject:novel' },
+  'north-america':     { label:'North American History',  q:'subject:("north america" OR "united states history" OR "american history" OR "maya" OR "aztec" OR "colonial america" OR "civil war" OR "american revolution" OR "native american history") AND (subject:history OR mediatype:texts) AND NOT subject:fiction' },
+  'south-america':     { label:'South American History',  q:'subject:("south america" OR "latin america" OR "inca" OR "peru" OR "brazil" OR "argentina" OR "colombia" OR "spanish conquest" OR "amazon") AND (subject:history OR mediatype:texts) AND NOT subject:fiction' },
+  'europe':            { label:'European History',        q:'subject:(europe OR european OR "ancient rome" OR "ancient greece" OR "roman empire" OR "medieval europe" OR "french revolution" OR "world war" OR "renaissance" OR "british empire" OR "ottoman") AND (subject:history OR mediatype:texts) AND NOT subject:fiction' },
+  'asia':              { label:'Asian History',           q:'subject:(asia OR asian OR china OR chinese OR japan OR japanese OR india OR "mughal" OR "silk road" OR "mongol" OR "han dynasty" OR "tang dynasty" OR "meiji" OR "vedic") AND (subject:history OR mediatype:texts) AND NOT subject:fiction' },
+  'middle-east':       { label:'Middle Eastern History',  q:'subject:("middle east" OR mesopotamia OR persia OR persian OR babylon OR assyria OR "ottoman empire" OR "islamic caliphate" OR "crusades" OR arabia OR "ancient israel") AND (subject:history OR mediatype:texts) AND NOT subject:fiction' },
+  'oceania':           { label:'Oceanian History',        q:'subject:(oceania OR australia OR "new zealand" OR polynesia OR pacific OR aboriginal OR maori OR melanesia OR micronesia) AND (subject:history OR mediatype:texts) AND NOT subject:fiction' },
+  'ancient':           { label:'Ancient World History',   q:'subject:("ancient history" OR "ancient world" OR mesopotamia OR babylon OR "ancient egypt" OR phoenicia OR "bronze age" OR "iron age" OR "ancient civilizations") AND (subject:history OR mediatype:texts)' },
+  'medieval':          { label:'Medieval History',        q:'subject:(medieval OR "middle ages" OR crusades OR feudalism OR "black death" OR "byzantine" OR "carolingian" OR "viking" OR "mongol empire") AND (subject:history OR mediatype:texts) AND NOT subject:fiction' },
+  'modern':            { label:'Modern World History',    q:'subject:("world war" OR "cold war" OR "decolonization" OR "independence movement" OR "colonial history" OR "industrial revolution" OR "french revolution" OR "russian revolution") AND (subject:history OR mediatype:texts) AND NOT subject:fiction' },
+  'science-history':   { label:'History of Science',      q:'subject:("history of science" OR "scientific revolution" OR "enlightenment" OR "industrial revolution" OR "space age" OR "history of medicine" OR "history of mathematics" OR "history of technology") AND mediatype:texts' },
+  'biography-history': { label:'Historical Figures',      q:'subject:(biography OR autobiography) AND (subject:history OR subject:"historical figure" OR subject:emperor OR subject:king OR subject:queen OR subject:revolutionary OR subject:conqueror OR subject:statesman) AND mediatype:texts' },
+};
+
+let currentHistoryQuery = '';
+let currentHistoryLabel = '';
+
+function backToHistoryRegions() {
+  document.getElementById('historyRegionView').style.display = 'block';
+  document.getElementById('historyResultsView').style.display = 'none';
+}
+
+async function loadHistoryRegion(regionKey) {
+  const region = HISTORY_REGIONS[regionKey];
+  if(!region) return;
+  currentHistoryQuery = region.q;
+  currentHistoryLabel = region.label;
+  showHistoryResults(region.label, 1);
+}
+
+async function loadHistoryEra(eraQuery, eraLabel) {
+  currentHistoryQuery = `subject:(${eraQuery}) AND mediatype:texts AND NOT subject:fiction AND NOT subject:novel`;
+  currentHistoryLabel = eraLabel;
+  showHistoryResults(eraLabel, 1);
+}
+
+async function searchHistory(q) {
+  if(!q||!q.trim()) return;
+  currentHistoryQuery = `(subject:(${q}) OR title:(${q})) AND mediatype:texts AND (subject:history OR subject:historical OR subject:civilization OR subject:empire OR subject:war OR subject:revolution)`;
+  currentHistoryLabel = 'Search: ' + q;
+  showHistoryResults('Results for "' + q + '"', 1);
+}
+
+async function showHistoryResults(label, page) {
+  document.getElementById('historyRegionView').style.display = 'none';
+  document.getElementById('historyResultsView').style.display = 'block';
+  document.getElementById('historyResultsHeading').textContent = label;
+
+  const grid = document.getElementById('historyGrid');
+  const perPage = 24;
+  const start = (page-1)*perPage;
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div><span>Loading...</span></div>';
+  document.getElementById('historyPagination').innerHTML = '';
+
+  // Fetch from both Archive.org AND Gutenberg in parallel
+  const results = [];
+
+  try {
+    const [archiveRes, gutenbergRes] = await Promise.allSettled([
+      // Archive.org
+      fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(currentHistoryQuery)}&fl[]=identifier,title,creator,date,subject,description&rows=${perPage}&start=${start}&output=json&sort[]=downloads+desc`)
+        .then(r=>r.ok?r.json():null),
+      // Gutenberg — use subject search
+      page===1 ? fetch(`https://gutendex.com/books/?topic=${encodeURIComponent(currentHistoryLabel.toLowerCase().replace(/[^a-z0-9 ]/g,''))}&page=1`)
+        .then(r=>r.ok?r.json():null) : Promise.resolve(null)
+    ]);
+
+    let total = 0;
+
+    // Process Archive results
+    if(archiveRes.status==='fulfilled' && archiveRes.value && archiveRes.value.response) {
+      const resp = archiveRes.value.response;
+      total = resp.numFound || 0;
+      (resp.docs||[]).forEach(d => {
+        const cover = `https://archive.org/services/img/${d.identifier}`;
+        const year = d.date ? d.date.substring(0,4) : '';
+        const creator = Array.isArray(d.creator)?d.creator[0]:(d.creator||'');
+        results.push({
+          id: d.identifier, title: d.title||'Unknown',
+          author: creator, cover, year,
+          src:'archive',
+          readUrl:`https://archive.org/embed/${d.identifier}`,
+          pageUrl:`https://archive.org/details/${d.identifier}`
+        });
+      });
+    }
+
+    // Add Gutenberg results on page 1 (prepend them as they're high quality)
+    if(gutenbergRes.status==='fulfilled' && gutenbergRes.value && page===1) {
+      const gBooks = (gutenbergRes.value.results||[]).slice(0,6);
+      gBooks.forEach(b => {
+        const cover = b.formats&&(b.formats['image/jpeg']||b.formats['image/png']||'');
+        const author = b.authors&&b.authors[0]?b.authors[0].name:'Unknown';
+        results.unshift({
+          id: b.id, title: b.title, author, cover,
+          src:'gutenberg', formats:b.formats||{}
+        });
+      });
+    }
+
+    const seen = new Set();
+    const unique = results.filter(r=>{ if(seen.has(String(r.id))) return false; seen.add(String(r.id)); return true; });
+
+    if(!unique.length) {
+      grid.innerHTML = '<div class="empty"><div class="ei">🏛️</div><p>No results found. Try a different search.</p></div>';
+      return;
+    }
+
+    grid.innerHTML = unique.map(b => {
+      if(b.src==='gutenberg') return buildBookCard(b);
+      const isSaved = savedBooks.some(s=>String(s.id)===String(b.id));
+      const obj = escAttr(JSON.stringify(b));
+      return `<div class="book-card" onclick="openArchiveModal('${escJs(b.id)}','${escJs(b.title)}','${escJs(b.author||'')}')">
+        <img class="book-cover" src="${b.cover}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="book-cover-placeholder" style="display:none">🏛️</div>
+        <div class="book-info">
+          <div class="book-title">${escHtml(b.title)}</div>
+          <div class="book-author">${escHtml(b.author||b.year||'')}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    if(total > perPage) {
+      renderPagination('historyPagination', page, total, perPage, `(p)=>showHistoryResults('${escJs(label)}',p)`);
+    }
+    if(page>1) scrollTop('page-history');
+
+  } catch(e) {
+    grid.innerHTML = '<div class="empty"><div class="ei">⚠️</div><p>Could not load history books.</p><button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="showHistoryResults(''+escJs(label)+'','+page+')">↺ Retry</button></div>';
+  }
+}
+
+// ============================================================
+// MYTHOLOGY
+// ============================================================
+
+const MYTH_QUERIES = {
+  'greek mythology':                   'Greek',
+  'roman mythology':                   'Roman',
+  'norse mythology':                   'Norse',
+  'egyptian mythology':                'Egyptian',
+  'hindu mythology vedas':             'Hindu',
+  'celtic mythology':                  'Celtic',
+  'mesopotamian mythology sumerian':   'Mesopotamian',
+  'chinese mythology folklore':        'Chinese',
+  'japanese mythology shinto':         'Japanese',
+  'african mythology folklore':        'African',
+  'aztec mythology mesoamerican':      'Aztec & Maya',
+  'native american mythology folklore':'Native American',
+  'polynesian mythology':              'Polynesian',
+  'slavic mythology folklore':         'Slavic',
+  'persian mythology zoroastrian':     'Persian',
+  'biblical mythology religion ancient':'Biblical & Abrahamic',
+};
+
+let currentMythQuery = '';
+let currentMythLabel = '';
+
+function backToMythRegions() {
+  document.getElementById('mythRegionView').style.display = 'block';
+  document.getElementById('mythResultsView').style.display = 'none';
+}
+
+async function loadMythology(query) {
+  const label = MYTH_QUERIES[query] || query;
+  currentMythQuery = `(subject:(${query}) OR title:(${query})) AND mediatype:texts AND (subject:mythology OR subject:myth OR subject:folklore OR subject:legend OR subject:religion)`;
+  currentMythLabel = label + ' Mythology';
+  showMythResults(label + ' Mythology', 1);
+}
+
+async function loadMythTheme(themeQuery, themeLabel) {
+  currentMythQuery = `(subject:(${themeQuery}) OR title:(${themeQuery})) AND mediatype:texts AND (subject:mythology OR subject:myth OR subject:folklore OR subject:legend)`;
+  currentMythLabel = themeLabel;
+  showMythResults(themeLabel, 1);
+}
+
+async function searchMythology(q) {
+  if(!q||!q.trim()) return;
+  currentMythQuery = `(subject:(${q}) OR title:(${q})) AND mediatype:texts AND (subject:mythology OR subject:myth OR subject:folklore OR subject:legend OR subject:gods OR subject:religion OR subject:ancient)`;
+  currentMythLabel = 'Search: ' + q;
+  showMythResults('Results for "' + q + '"', 1);
+}
+
+async function showMythResults(label, page) {
+  document.getElementById('mythRegionView').style.display = 'none';
+  document.getElementById('mythResultsView').style.display = 'block';
+  document.getElementById('mythResultsHeading').textContent = label;
+
+  const grid = document.getElementById('mythGrid');
+  const perPage = 24;
+  const start = (page-1)*perPage;
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div><span>Loading mythology...</span></div>';
+  document.getElementById('mythPagination').innerHTML = '';
+
+  const results = [];
+  try {
+    const [archiveRes, gutenbergRes] = await Promise.allSettled([
+      fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(currentMythQuery)}&fl[]=identifier,title,creator,date,subject&rows=${perPage}&start=${start}&output=json&sort[]=downloads+desc`)
+        .then(r=>r.ok?r.json():null),
+      page===1 ? fetch(`https://gutendex.com/books/?topic=myth&search=${encodeURIComponent(currentMythLabel.replace(' Mythology','').replace('Search: ',''))}&page=1`)
+        .then(r=>r.ok?r.json():null) : Promise.resolve(null)
+    ]);
+
+    let total = 0;
+
+    if(archiveRes.status==='fulfilled' && archiveRes.value && archiveRes.value.response) {
+      const resp = archiveRes.value.response;
+      total = resp.numFound||0;
+      (resp.docs||[]).forEach(d=>{
+        const cover = `https://archive.org/services/img/${d.identifier}`;
+        const year = d.date?d.date.substring(0,4):'';
+        const creator = Array.isArray(d.creator)?d.creator[0]:(d.creator||'');
+        results.push({id:d.identifier,title:d.title||'Unknown',author:creator,cover,year,src:'archive',
+          readUrl:`https://archive.org/embed/${d.identifier}`,pageUrl:`https://archive.org/details/${d.identifier}`});
+      });
+    }
+
+    if(gutenbergRes.status==='fulfilled' && gutenbergRes.value && page===1){
+      (gutenbergRes.value.results||[]).slice(0,6).forEach(b=>{
+        const cover=b.formats&&(b.formats['image/jpeg']||b.formats['image/png']||'');
+        const author=b.authors&&b.authors[0]?b.authors[0].name:'Unknown';
+        results.unshift({id:b.id,title:b.title,author,cover,src:'gutenberg',formats:b.formats||{}});
+      });
+    }
+
+    const seen=new Set();
+    const unique=results.filter(r=>{if(seen.has(String(r.id)))return false;seen.add(String(r.id));return true;});
+
+    if(!unique.length){
+      grid.innerHTML='<div class="empty"><div class="ei">⚡</div><p>No results found. Try a different tradition.</p></div>';
+      return;
+    }
+
+    // Myth card — slightly different look with coloured placeholder
+    const mythColors=['#1a0a2e','#2e1a0a','#0a1a2e','#2e2a0a','#0a2e0a','#2e0a1a','#1a2e0a','#0a0a2e'];
+    grid.innerHTML = unique.map((b,i) => {
+      if(b.src==='gutenberg') {
+        // Reuse book card but with myth styling
+        const cover = b.cover||'';
+        const d = escAttr(JSON.stringify(b));
+        return `<div class="myth-card" onclick="openBookModal('${d}')">
+          ${cover?`<img class="myth-cover" src="${cover}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''}
+          <div class="myth-cover-ph" style="background:${mythColors[i%mythColors.length]};${cover?'display:none':''}">⚡</div>
+          <div class="myth-info"><div class="myth-title">${escHtml(b.title)}</div><div class="myth-origin">${escHtml(b.author)}</div></div>
+        </div>`;
+      }
+      const mythEmojis=['⚡','🔱','🌊','🌙','☀️','⚔️','🐉','🌟','🔥','💀','🌑','🌿'];
+      return `<div class="myth-card" onclick="openArchiveModal('${escJs(b.id)}','${escJs(b.title)}','${escJs(b.author||'')}')">
+        <img class="myth-cover" src="${b.cover}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="myth-cover-ph" style="background:${mythColors[i%mythColors.length]};display:none">${mythEmojis[i%mythEmojis.length]}</div>
+        <div class="myth-info">
+          <div class="myth-title">${escHtml(b.title)}</div>
+          <div class="myth-origin">${escHtml(b.author||b.year||'')}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    if(total>perPage) {
+      renderPagination('mythPagination',page,total,perPage,`(p)=>showMythResults('${escJs(label)}',p)`);
+    }
+    if(page>1) scrollTop('page-mythology');
+
+  } catch(e) {
+    grid.innerHTML='<div class="empty"><div class="ei">⚠️</div><p>Could not load mythology books.</p></div>';
+  }
+}
+
 // ============ INDEXED DB — AUDIO CACHE ============
 // Saves narration (sentences + position) per book so it persists across sessions.
 // Deleted only when the user explicitly removes it.
