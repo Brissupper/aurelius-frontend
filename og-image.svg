@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a14"/>
+      <stop offset="50%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#0a0a14"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#c9a84c"/>
+      <stop offset="100%" style="stop-color:#e8c97a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="1050" cy="100" r="280" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.08"/>
+  <circle cx="1050" cy="100" r="200" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.06"/>
+  <circle cx="150" cy="530" r="200" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.05"/>
+
+  <!-- Book emoji large -->
+  <text x="100" y="260" font-size="160" font-family="Arial">📚</text>
+
+  <!-- Title -->
+  <text x="310" y="210" font-family="Georgia, serif" font-size="72" font-weight="700" fill="#c9a84c" letter-spacing="2">AURELIUS</text>
+  <text x="310" y="290" font-family="Georgia, serif" font-size="52" font-weight="400" fill="#e8e8f0" letter-spacing="4">WORLD LIBRARY</text>
+
+  <!-- Divider line -->
+  <rect x="310" y="316" width="700" height="2" fill="url(#accent)" opacity="0.6"/>
+
+  <!-- Tagline -->
+  <text x="310" y="370" font-family="Arial, sans-serif" font-size="28" fill="#888899">Millions of books, comics, audiobooks &amp; history</text>
+  <text x="310" y="410" font-family="Arial, sans-serif" font-size="28" fill="#888899">archives — free to explore. No subscription needed.</text>
+
+  <!-- Feature badges -->
+  <rect x="310" y="450" width="160" height="44" rx="22" fill="#1a1a2e" stroke="#c9a84c" stroke-width="1.5" opacity="0.8"/>
+  <text x="390" y="478" font-family="Arial" font-size="20" fill="#c9a84c" text-anchor="middle">📖 Books</text>
+
+  <rect x="490" y="450" width="180" height="44" rx="22" fill="#1a1a2e" stroke="#c9a84c" stroke-width="1.5" opacity="0.8"/>
+  <text x="580" y="478" font-family="Arial" font-size="20" fill="#c9a84c" text-anchor="middle">🎧 Audiobooks</text>
+
+  <rect x="690" y="450" width="170" height="44" rx="22" fill="#1a1a2e" stroke="#c9a84c" stroke-width="1.5" opacity="0.8"/>
+  <text x="775" y="478" font-family="Arial" font-size="20" fill="#c9a84c" text-anchor="middle">💥 Comics</text>
+
+  <rect x="880" y="450" width="170" height="44" rx="22" fill="#1a1a2e" stroke="#c9a84c" stroke-width="1.5" opacity="0.8"/>
+  <text x="965" y="478" font-family="Arial" font-size="20" fill="#c9a84c" text-anchor="middle">🏛️ History</text>
+
+  <!-- URL -->
+  <text x="310" y="580" font-family="Arial, sans-serif" font-size="24" fill="#c9a84c" opacity="0.7">aureliusworldlibrary.dpdns.org</text>
+</svg>

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://aureliusworldlibrary.dpdns.org/sitemap.xml
