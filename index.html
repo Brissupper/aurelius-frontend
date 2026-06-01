@@ -403,6 +403,15 @@ html,body{height:100%;overflow:hidden;font-family:'Lato',sans-serif;background:v
       </div>
       <div class="adult-subrow" id="adultSubRow">
         <button class="sub-pill active" onclick="selectAdultSub(this,'all')">&#128293; All Adult</button>
+        <!-- Anime / Hentai -->
+        <button class="sub-pill" onclick="selectAdultSub(this,'hentai')">&#127981; Hentai</button>
+        <button class="sub-pill" onclick="selectAdultSub(this,'anime-fantasy')">&#9889; Anime Fantasy</button>
+        <button class="sub-pill" onclick="selectAdultSub(this,'anime-school')">&#127979; School/Ecchi</button>
+        <button class="sub-pill" onclick="selectAdultSub(this,'anime-monster')">&#128009; Monster Girls</button>
+        <button class="sub-pill" onclick="selectAdultSub(this,'anime-yaoi')">&#128154; Yaoi (BL)</button>
+        <button class="sub-pill" onclick="selectAdultSub(this,'anime-yuri')">&#128149; Yuri (GL)</button>
+        <button class="sub-pill" onclick="selectAdultSub(this,'doujinshi')">&#128218; Doujinshi</button>
+        <!-- Live action -->
         <button class="sub-pill" onclick="selectAdultSub(this,'straight')">Straight</button>
         <button class="sub-pill" onclick="selectAdultSub(this,'gay')">Gay</button>
         <button class="sub-pill" onclick="selectAdultSub(this,'lesbian')">Lesbian</button>
@@ -412,7 +421,6 @@ html,body{height:100%;overflow:hidden;font-family:'Lato',sans-serif;background:v
         <button class="sub-pill" onclick="selectAdultSub(this,'milf')">MILF</button>
         <button class="sub-pill" onclick="selectAdultSub(this,'bbw')">BBW</button>
         <button class="sub-pill" onclick="selectAdultSub(this,'bdsm')">BDSM</button>
-        <button class="sub-pill" onclick="selectAdultSub(this,'hentai')">Hentai</button>
         <button class="sub-pill" onclick="selectAdultSub(this,'underground')">Underground</button>
       </div>
       <div class="section-hdr"><h2 id="comicsHeading">Superhero Comics</h2></div>
@@ -1102,19 +1110,44 @@ const CQ = {
 };
 
 // Adult queries — all require explicit adult subject tags
-// and use OR across multiple related tags for maximum coverage per page
+// Anime/hentai categories use broad Japanese adult manga terminology
+// for maximum coverage from Archive.org collections
 const ADQ = {
-  all:        'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:"underground comix" OR subject:erotica OR subject:"erotic comic") AND NOT subject:superhero',
-  straight:   'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:heterosexual OR subject:straight OR subject:"male-female" OR subject:pinup OR subject:"pin-up")',
-  gay:        'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica OR subject:"gay comics" OR subject:"gay erotica") AND (subject:gay OR subject:"gay male" OR subject:"men loving men")',
-  lesbian:    'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica OR subject:"lesbian comics") AND (subject:lesbian OR subject:"women loving women" OR subject:"sapphic")',
+  // ── General ──────────────────────────────────────────────────────────────
+  all:        'mediatype:texts AND (subject:hentai OR subject:"adult manga" OR subject:"erotic manga" OR subject:"adult comics" OR subject:"erotic comics" OR subject:"underground comix" OR subject:erotica OR collection:hentai) AND NOT subject:superhero',
+
+  // ── Anime / Hentai categories ────────────────────────────────────────────
+  // Main hentai — widest net across Archive.org hentai collections
+  hentai:     'mediatype:texts AND (subject:hentai OR subject:"adult manga" OR subject:"erotic manga" OR collection:hentai OR subject:"ecchi" OR subject:"adult anime" OR subject:"hentai manga" OR subject:"18+" OR subject:"mature anime")',
+
+  // Anime Fantasy — isekai, fantasy worlds, magic, demons, elves
+  'anime-fantasy': 'mediatype:texts AND (subject:hentai OR subject:"adult manga" OR subject:"erotic manga" OR collection:hentai) AND (subject:fantasy OR subject:isekai OR subject:demon OR subject:elf OR subject:magic OR subject:dragon OR subject:succubus OR subject:monster OR subject:supernatural)',
+
+  // School / Ecchi — school settings, ecchi, romance comedy
+  'anime-school': 'mediatype:texts AND (subject:hentai OR subject:"adult manga" OR subject:"erotic manga" OR subject:ecchi OR collection:hentai) AND (subject:school OR subject:ecchi OR subject:student OR subject:"school girl" OR subject:"high school" OR subject:"romance comedy" OR subject:sensei)',
+
+  // Monster Girls — catgirls, foxgirls, lamia, etc.
+  'anime-monster': 'mediatype:texts AND (subject:hentai OR subject:"adult manga" OR subject:"erotic manga" OR collection:hentai) AND (subject:monster OR subject:"monster girl" OR subject:catgirl OR subject:foxgirl OR subject:nekomimi OR subject:kemono OR subject:furry OR subject:tentacle OR subject:beast)',
+
+  // Yaoi / Boys Love — male×male anime/manga
+  'anime-yaoi': 'mediatype:texts AND (subject:yaoi OR subject:"boys love" OR subject:"BL manga" OR subject:"shounen ai" OR subject:"male manga" OR subject:"gay manga") AND (subject:manga OR subject:anime OR subject:"adult manga" OR subject:hentai)',
+
+  // Yuri / Girls Love — female×female anime/manga
+  'anime-yuri': 'mediatype:texts AND (subject:yuri OR subject:"girls love" OR subject:"GL manga" OR subject:"shoujo ai" OR subject:"lesbian manga" OR subject:"yuri manga") AND (subject:manga OR subject:anime OR subject:"adult manga" OR subject:hentai)',
+
+  // Doujinshi — fan-made manga, parody comics
+  'doujinshi': 'mediatype:texts AND (subject:doujinshi OR subject:doujin OR subject:"fan manga" OR subject:"parody manga" OR subject:"fan comic" OR subject:"comic anthology") AND (subject:hentai OR subject:"adult manga" OR subject:"erotic manga" OR collection:hentai)',
+
+  // ── Western adult categories ─────────────────────────────────────────────
+  straight:   'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:heterosexual OR subject:straight OR subject:"male-female" OR subject:pinup OR subject:"pin-up") AND NOT subject:hentai AND NOT subject:manga',
+  gay:        'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica OR subject:"gay comics" OR subject:"gay erotica") AND (subject:gay OR subject:"gay male" OR subject:"men loving men") AND NOT subject:yaoi AND NOT subject:manga',
+  lesbian:    'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica OR subject:"lesbian comics") AND (subject:lesbian OR subject:"women loving women" OR subject:sapphic) AND NOT subject:yuri AND NOT subject:manga',
   trans:      'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:transgender OR subject:trans OR subject:"gender bending" OR subject:crossdressing)',
   bisexual:   'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:bisexual OR subject:"bi comics" OR subject:"group sex")',
   interracial:'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:interracial OR subject:"interracial sex" OR subject:"mixed couples")',
-  milf:       'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:milf OR subject:mature OR subject:"older women" OR subject:"cougar")',
-  bbw:        'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:bbw OR subject:"plus size" OR subject:"curvy" OR subject:"full figured")',
+  milf:       'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:milf OR subject:mature OR subject:"older women" OR subject:cougar)',
+  bbw:        'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:bbw OR subject:"plus size" OR subject:curvy OR subject:"full figured")',
   bdsm:       'mediatype:texts AND (subject:"adult comics" OR subject:"erotic comics" OR subject:erotica) AND (subject:bdsm OR subject:bondage OR subject:fetish OR subject:dominatrix OR subject:submission)',
-  hentai:     'mediatype:texts AND (subject:hentai OR subject:"adult manga" OR subject:"erotic manga" OR collection:hentai OR subject:"ecchi")',
   underground:'mediatype:texts AND (subject:"underground comix" OR collection:underground_comix OR subject:comix OR subject:"Zap Comix" OR subject:"underground comics")',
 };
 
@@ -1145,7 +1178,7 @@ async function loadComics(page){
   pg.comics.page=page;
   const grid=document.getElementById('comicsGrid'),heading=document.getElementById('comicsHeading');
   const mL={superhero:'Superhero',manga:'Manga',horror:'Horror','sci-fi':'Sci-Fi',fantasy:'Fantasy',romance:'Romance',war:'War',western:'Western',crime:'Crime',adult:'Adult'};
-  const sL={all:'Adult',straight:'Straight',gay:'Gay',lesbian:'Lesbian',trans:'Trans',bisexual:'Bisexual',interracial:'Interracial',milf:'MILF',bbw:'BBW',bdsm:'BDSM',hentai:'Hentai',underground:'Underground'};
+  const sL={all:'Adult',straight:'Straight',gay:'Gay',lesbian:'Lesbian',trans:'Trans',bisexual:'Bisexual',interracial:'Interracial',milf:'MILF',bbw:'BBW',bdsm:'BDSM',hentai:'Hentai',underground:'Underground','anime-fantasy':'Anime Fantasy','anime-school':'School / Ecchi','anime-monster':'Monster Girls','anime-yaoi':'Yaoi (BL)','anime-yuri':'Yuri (GL)','doujinshi':'Doujinshi'};
   heading.textContent=(currentComicCat==='adult'?sL[currentAdultSub]:mL[currentComicCat])+' Comics';
   grid.innerHTML='<div class="loading"><div class="spinner"></div><span>Loading comics...</span></div>';
   document.getElementById('comicsPagination').innerHTML='';
@@ -1177,7 +1210,7 @@ async function loadComics(page){
     if(!docs.length && page===1){
       // Try a broader fallback query for this category
       const fallbackQ = currentComicCat==='adult'
-        ? 'mediatype:texts AND subject:erotica'
+        ? 'mediatype:texts AND (subject:hentai OR subject:"adult manga" OR subject:erotica)'
         : `mediatype:texts AND subject:comics AND subject:${currentComicCat}`;
       const ctrl2=new AbortController(); setTimeout(()=>ctrl2.abort(),10000);
       const r2=await fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(fallbackQ)}&fl[]=identifier,title,creator,date&rows=${perPage}&start=0&output=json&sort[]=downloads+desc`,{signal:ctrl2.signal});
